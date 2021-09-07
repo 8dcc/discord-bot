@@ -23,9 +23,9 @@ def debug_print(text):
 
 @client.event
 async def on_ready():
-    print("---------------------------------------")
-    print("The bot has connected to Discord!")
-    print("---------------------------------------")
+    print("----------------------------------------------------------------")
+    print("The bot %s has connected to Discord!" % client.user)
+    print("----------------------------------------------------------------")
     if activityType is "Playing":
         await client.change_presence(activity=discord.Game(name="with your stepmom"))
     elif activityType is "Watching":
@@ -35,21 +35,26 @@ async def on_ready():
     else:
         exit("activityType error. Exiting...")
 
+# Whitelist an id
+def check_waifu():
+    def predicate(ctx):
+        return ctx.author.id == 123123123123123123  # Whitelisted id
+    return commands.check(predicate)
+
 @client.command()
-@commands.is_owner()
-async def kick(ctx, member : discord.Member, *, reason=None):
+@commands.check_any(commands.is_owner(), check_waifu())  # Only the owner and the whitelisted user will be able to use this command
+async def kick(ctx, member : discord.Member, *, reason=None):  # Kick command
     await member.kick(reason=reason)
     await ctx.send("%s has been kicked." % member)
 
 @client.command()
-@commands.is_owner()
-async def ban(ctx, member : discord.Member, *, reason=None):
+@commands.check_any(commands.is_owner(), check_waifu())
+async def ban(ctx, member : discord.Member, *, reason=None):  # Ban command
     await member.kick(reason=reason)
     await ctx.send("%s has been banned." % member)
 
 @client.event
 async def on_message(message):
-    print(client.user)
     if message.author == client.user:
         return
 
@@ -57,18 +62,19 @@ async def on_message(message):
         debug_message = "[%s]-[%s]: %s" % (message.author, message.channel, message.content)
         debug_print(debug_message)
 
-    if message.content == "ping":
+    if message.content == "ping":  # Ping command to see if it works
         await message.channel.send("pong")
 
     if "uwu" in message.content.lower():
         if debug:
             debug_print("[Bot] uwu detected...")
         await message.channel.send("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+        channel = client.get_channel(884837939484442675)
+        await channel.send("[Baneable] El usuario %s dijo la palabra prohibida." % message.author.display_name)
 
     await client.process_commands(message)
 
-# Start bot
 try:
-    client.run(TOKEN.replace("{","").replace("}",""))
+    client.run(TOKEN.replace("{","").replace("}",""))  # Start bot
 except KeyboardInterrupt:
     exit("\nDetected Ctrl+C. Exiting...\n")
