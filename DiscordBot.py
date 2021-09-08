@@ -2,24 +2,25 @@ import discord, os
 from discord.ext import commands
 from dotenv import load_dotenv
 
-############################
+##############################
 activityType = "Watching"
 debug = True
-############################
+##############################
 
 load_dotenv()
-TOKEN = os.getenv('DISCORD_TOKEN')  # Replace with your token or whatever
+TOKEN = os.getenv('DISCORD_TOKEN')
 
 client = commands.Bot(command_prefix='n!')
-
 creator_name = "YOUR_NAME#1234"
+
+# ---------------------------------------------------------------
 
 def debug_print(text):
     write_to_log = True  # Will only work if debug is true
     print(text)
     if write_to_log:
-         with open("discord-bot.log", "a") as discord_log:
-             discord_log.write(text)
+        with open("/your/folder/here/discord-bot.log", "a") as discord_log:
+            discord_log.write(text + "\n")
 
 @client.event
 async def on_ready():
@@ -35,23 +36,131 @@ async def on_ready():
     else:
         exit("activityType error. Exiting...")
 
-# Whitelist an id
+# ---------------------------------------------------------------
+
+@client.command()
+async def play(ctx, url : str):
+    if ctx.author.voice is None:
+        await ctx.send(":warning:  **I can't find your channel,** %s" % ctx.author.mention)
+        debug_print('Could not find channel for user: %s' % ctx.author)
+        return
+    else:
+        voiceChannel = ctx.author.voice.channel
+        voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+        if voice == None:
+            await voiceChannel.connect()
+            await ctx.send(":musical_note:  **Joined channel `%s`**" % str(ctx.author.voice.channel))
+            debug_print('[Bot] %s requested \'%s\'. Joined channel %s.' % (str(ctx.author), url, str(voiceChannel)))
+        else:
+            await ctx.send(":warning:  **I am in that channel you fucking piece of shit.** %s" % ctx.author.mention)
+            debug_print('[Bot] %s Requested a song, but I am already in that channel.' % ctx.author)
+            return
+
+@play.error
+async def play_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send(':warning: **Missing required arguments. Usage:**  `n!play <url>`')
+        debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
+
+@client.command()
+async def join(ctx):
+    if ctx.author.voice is None:
+        await ctx.send(":warning:  **I can't find your channel,** %s" % ctx.author.mention)
+        debug_print('Could not find channel for user: %s' % ctx.author)
+        return
+    else:
+        voiceChannel = ctx.author.voice.channel
+        voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+        if voice == None:
+            await voiceChannel.connect()
+            await ctx.send(":ballot_box_with_check:  **Joined channel `%s`**" % str(ctx.author.voice.channel))
+            debug_print('[Bot] %s requested join command. Joined channel %s.' % (str(ctx.author), str(voiceChannel)))
+        else:
+            await ctx.send(":warning:  **I am in that channel you fucking piece of shit.** %s" % ctx.author.mention)
+            debug_print('[Bot] %s Requested a song, but I am already in that channel.' % ctx.author)
+            return
+
+
+@client.command()
+async def leave(ctx):
+    voiceChannel = ctx.author.voice.channel
+    voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+    if voice is not None:
+        await ctx.send(":call_me:  **Leaving channel `%s`**" % str(ctx.author.voice.channel))
+        debug_print('[Bot] %s requested leave command. Leaving channel %s.' % (str(ctx.author), str(voiceChannel)))
+        await voice.disconnect()
+    else:
+        await ctx.send(":no_entry_sign:  **I am not in any channel.** %s" % ctx.author.mention)
+        debug_print('[Bot] %s Requested leave, but I am not in a channel.' % ctx.author)
+        return
+
+
+@client.command()
+async def pause(ctx):
+    voiceChannel = ctx.author.voice.channel
+    voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+    if voice.is_playing():
+        await ctx.send(":pause_button:  **Pausing audio**")
+        debug_print('[Bot] %s requested pause command. Pausing audio...' % str(ctx.author))
+        await voice.pause()
+    else:
+        await ctx.send(":no_entry_sign:  **I am not playing any audio.** %s" % ctx.author.mention)
+        debug_print('[Bot] %s Requested pause, but I am not playing any audio.' % ctx.author)
+        return
+
+
+@client.command()
+async def resume(ctx):
+    voiceChannel = ctx.author.voice.channel
+    voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+    if voice.is_paused():
+        await ctx.send(":arrow_forward:  **Resuming audio**")
+        debug_print('[Bot] %s requested resume command. Resuming audio...' % str(ctx.author))
+        await voice.resume()
+    else:
+        await ctx.send(":no_entry_sign:  **The audio is not paused.** %s" % ctx.author.mention)
+        debug_print('[Bot] %s Requested resume, but the audio is not paused.' % ctx.author)
+        return
+
+@client.command()
+async def stop(ctx):
+    voiceChannel = ctx.author.voice.channel
+    voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+    if voice.is_paused():
+        await ctx.send(":no_entry:  **Resuming audio**")
+        debug_print('[Bot] %s requested stop command. Stoping audio...' % str(ctx.author))
+        await voice.resume()
+    else:
+        await ctx.send(":no_entry_sign:  **The audio is not playing.** %s" % ctx.author.mention)
+        debug_print('[Bot] %s Requested stop, but the audio is not playing.' % ctx.author)
+        return
+
+
+# ---------------------------------------------------------------
+
 def check_waifu():
     def predicate(ctx):
-        return ctx.author.id == 123123123123123123  # Whitelisted id
+        return ctx.author.id == 123123123123123123  # Whitelisted user 1
+    return commands.check(predicate)
+
+def check_server_owner():
+    def predicate(ctx):
+        return ctx.author.id == 123123123123123123  # Whitelisted user 2
     return commands.check(predicate)
 
 @client.command()
-@commands.check_any(commands.is_owner(), check_waifu())  # Only the owner and the whitelisted user will be able to use this command
-async def kick(ctx, member : discord.Member, *, reason=None):  # Kick command
+@commands.check_any(commands.is_owner(), check_waifu(), check_server_owner())
+async def kick(ctx, member : discord.Member, *, reason=None):
     await member.kick(reason=reason)
     await ctx.send("%s has been kicked." % member)
 
 @client.command()
-@commands.check_any(commands.is_owner(), check_waifu())
-async def ban(ctx, member : discord.Member, *, reason=None):  # Ban command
+@commands.check_any(commands.is_owner(), check_waifu(), check_server_owner())
+async def ban(ctx, member : discord.Member, *, reason=None):
     await member.kick(reason=reason)
     await ctx.send("%s has been banned." % member)
+
+# ---------------------------------------------------------------
 
 @client.event
 async def on_message(message):
@@ -60,21 +169,24 @@ async def on_message(message):
 
     if debug:
         debug_message = "[%s]-[%s]: %s" % (message.author, message.channel, message.content)
-        debug_print(debug_message)
+        if "musica" not in str(message.channel).lower():
+            debug_print(debug_message)
 
-    if message.content == "ping":  # Ping command to see if it works
+    if message.content == "ping":
         await message.channel.send("pong")
 
     if "uwu" in message.content.lower():
         if debug:
             debug_print("[Bot] uwu detected...")
         await message.channel.send("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
-        channel = client.get_channel(884837939484442675)
-        await channel.send("[Baneable] El usuario %s dijo la palabra prohibida." % message.author.display_name)
+        channel = client.get_channel(123123123123123123)  # Channel to send admin messages
+        await channel.send("User %s said a forbidden word." % message.author.display_name)
 
     await client.process_commands(message)
 
+# ---------------------------------------------------------------
+
 try:
-    client.run(TOKEN.replace("{","").replace("}",""))  # Start bot
+    client.run(TOKEN.replace("{","").replace("}",""))  # Start bot with the token from .env
 except KeyboardInterrupt:
     exit("\nDetected Ctrl+C. Exiting...\n")
