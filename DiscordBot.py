@@ -1,6 +1,7 @@
 import discord, os
 from discord.ext import commands
 from dotenv import load_dotenv
+import youtube_dl
 
 ##############################
 activityType = "Watching"
@@ -40,22 +41,48 @@ async def on_ready():
 
 @client.command()
 async def play(ctx, url : str):
+    song_there = os.path.isfile("song.mp3")
     if ctx.author.voice is None:
         await ctx.send(":warning:  **I can't find your channel,** %s" % ctx.author.mention)
         debug_print('Could not find channel for user: %s' % ctx.author)
-        return
     else:
+        try:
+            if song_there:
+                os.remove("song.mp3")
+        except PermissionError:
+            await ctx.send(":information_source:  **Wait for the current audio to end or use the `stop` command**")
+
         voiceChannel = ctx.author.voice.channel
         voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
-        if voice == None:
-            await voiceChannel.connect()
-            await ctx.send(":musical_note:  **Joined channel `%s`**" % str(ctx.author.voice.channel))
-            debug_print('[Bot] %s requested \'%s\'. Joined channel %s.' % (str(ctx.author), url, str(voiceChannel)))
+        if not voice is None:
+            if not voice.is_connected():
+                await voiceChannel.connect()
+                await ctx.send(":ballot_box_with_check:  **Joined channel `%s`**" % str(ctx.author.voice.channel))
+                debug_print('[Bot] %s requested a song. Joined channel %s.' % (str(ctx.author), url, str(voiceChannel)))
         else:
-            await ctx.send(":warning:  **I am in that channel you fucking piece of shit.** %s" % ctx.author.mention)
-            debug_print('[Bot] %s Requested a song, but I am already in that channel.' % ctx.author)
-            return
+            await voiceChannel.connect()
+            await ctx.send(":ballot_box_with_check:  **Joined channel `%s`**" % str(ctx.author.voice.channel))
+            debug_print('[Bot] %s requested a song. Joined channel %s.' % (str(ctx.author), url, str(voiceChannel)))
 
+        ydl_opts = {
+            'format': 'bestaudio/best',
+            'postprocessors': [{
+                'key': 'FFmpegExtractAudio',
+                'preferredcodec': 'mp3',
+                'preferredquality': '192',
+            }],
+        }
+
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            info_dict = ydl.extract_info(url, download=False)
+            await ctx.send(":musical_note:  **Playing `%s`**" % info_dict["title"])
+            debug_print('[Bot] %s requested \'%s\'.' % (str(ctx.author), url))
+            ydl.download([url])
+        for file in os.listdir("./"):
+            if file.endswith(".mp3"):
+                os.rename(file, "song.mp3")
+        voice.play(discord.FFmpegPCMAudio("song.mp3"))
+        
 @play.error
 async def play_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
@@ -89,6 +116,7 @@ async def leave(ctx):
         await ctx.send(":call_me:  **Leaving channel `%s`**" % str(ctx.author.voice.channel))
         debug_print('[Bot] %s requested leave command. Leaving channel %s.' % (str(ctx.author), str(voiceChannel)))
         await voice.disconnect()
+        os.remove("song.mp3")
     else:
         await ctx.send(":no_entry_sign:  **I am not in any channel.** %s" % ctx.author.mention)
         debug_print('[Bot] %s Requested leave, but I am not in a channel.' % ctx.author)
@@ -126,15 +154,15 @@ async def resume(ctx):
 async def stop(ctx):
     voiceChannel = ctx.author.voice.channel
     voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
-    if voice.is_paused():
+    if not voice.is_paused():
         await ctx.send(":no_entry:  **Resuming audio**")
         debug_print('[Bot] %s requested stop command. Stoping audio...' % str(ctx.author))
         await voice.stop()
+        os.remove("song.mp3")
     else:
         await ctx.send(":no_entry_sign:  **The audio is not playing.** %s" % ctx.author.mention)
         debug_print('[Bot] %s Requested stop, but the audio is not playing.' % ctx.author)
         return
-
 
 # ---------------------------------------------------------------
 
