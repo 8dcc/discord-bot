@@ -7,6 +7,7 @@
 * `n!leave` - Leaves the current channel.
 * `n!pause` - Pauses the audio.
 * `n!resume` - Resumes the audio.
+* `n!stop` - Stops the audio without leaving the channel.
 ### Administration:
 * `n!kick @someone` to kick a user (only works if you are the bot owner)
 * `n!ban @someone` to ban a user (only works if you are the bot owner)
