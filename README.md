@@ -2,7 +2,7 @@
 **My discord bot made in python.**
 ## Features:
 ### Music:
-* `n!play <url>` - Play audio in a voice channel.
+* `n!play <url>` - Play audio in a voice channel. (Not working atm)
 * `n!join` - Join the user's channel.
 * `n!leave` - Leaves the current channel.
 * `n!pause` - Pauses the audio.
