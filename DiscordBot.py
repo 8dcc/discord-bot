@@ -129,7 +129,7 @@ async def stop(ctx):
     if voice.is_paused():
         await ctx.send(":no_entry:  **Resuming audio**")
         debug_print('[Bot] %s requested stop command. Stoping audio...' % str(ctx.author))
-        await voice.resume()
+        await voice.stop()
     else:
         await ctx.send(":no_entry_sign:  **The audio is not playing.** %s" % ctx.author.mention)
         debug_print('[Bot] %s Requested stop, but the audio is not playing.' % ctx.author)
