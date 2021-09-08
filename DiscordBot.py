@@ -11,7 +11,7 @@ debug = True
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-client = commands.Bot(command_prefix='n!')
+client = commands.Bot(command_prefix='n!')  # Your bot prefix
 creator_name = "YOUR_NAME#1234"
 
 # ---------------------------------------------------------------
@@ -40,7 +40,7 @@ async def on_ready():
 # ---------------------------------------------------------------
 
 @client.command()
-async def play(ctx, url : str):
+async def play(ctx, *, url : str):
     song_there = os.path.isfile("song.mp3")
     if ctx.author.voice is None:
         await ctx.send(":warning:  **I can't find your channel,** %s" % ctx.author.mention)
@@ -54,15 +54,10 @@ async def play(ctx, url : str):
 
         voiceChannel = ctx.author.voice.channel
         voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
-        if not voice is None:
-            if not voice.is_connected():
-                await voiceChannel.connect()
-                await ctx.send(":ballot_box_with_check:  **Joined channel `%s`**" % str(ctx.author.voice.channel))
-                debug_print('[Bot] %s requested a song. Joined channel %s.' % (str(ctx.author), url, str(voiceChannel)))
-        else:
+        if voice is None:
             await voiceChannel.connect()
             await ctx.send(":ballot_box_with_check:  **Joined channel `%s`**" % str(ctx.author.voice.channel))
-            debug_print('[Bot] %s requested a song. Joined channel %s.' % (str(ctx.author), url, str(voiceChannel)))
+            debug_print('[Bot] %s requested a song. Joined channel %s.' % (str(ctx.author), str(voiceChannel)))
 
         ydl_opts = {
             'format': 'bestaudio/best',
@@ -73,16 +68,34 @@ async def play(ctx, url : str):
             }],
         }
 
-        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-            info_dict = ydl.extract_info(url, download=False)
-            await ctx.send(":musical_note:  **Playing `%s`**" % info_dict["title"])
-            debug_print('[Bot] %s requested \'%s\'.' % (str(ctx.author), url))
-            ydl.download([url])
-        for file in os.listdir("./"):
-            if file.endswith(".mp3"):
-                os.rename(file, "song.mp3")
-        voice.play(discord.FFmpegPCMAudio("song.mp3"))
-        
+        if "youtube.com" in url or ".mp3" in url:
+            with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+                info_dict = ydl.extract_info(url, download=False)
+                await ctx.send(":musical_note:  **Playing `%s`**" % info_dict["title"])
+                debug_print('[Bot] %s requested \'%s\'.' % (str(ctx.author), url))
+                ydl.download([url])
+            for file in os.listdir("./"):
+                if file.endswith(".mp3"):
+                    os.rename(file, "song.mp3")
+            voice.play(discord.FFmpegPCMAudio("song.mp3"))
+        else:
+            with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+                try:
+                    get(url)
+                except:
+                    video_dict = ydl.extract_info("ytsearch:%s" % url, download=False)['entries'][0]
+                else:
+                    video_dict = ydl.extract_info(url, download = False)
+
+                await ctx.send(":musical_note:  **Playing `%s`**" % video_dict["title"])
+                debug_print('[Bot] %s requested \'%s\'.' % (str(ctx.author), video_dict["webpage_url"]))
+                ydl.download([video_dict["webpage_url"]])
+            for file in os.listdir("./"):
+                if file.endswith(".mp3"):
+                    os.rename(file, "song.mp3")
+            voice.play(discord.FFmpegPCMAudio("song.mp3"))
+
+
 @play.error
 async def play_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
@@ -155,7 +168,7 @@ async def stop(ctx):
     voiceChannel = ctx.author.voice.channel
     voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
     if not voice.is_paused():
-        await ctx.send(":no_entry:  **Resuming audio**")
+        await ctx.send(":no_entry:  **Stoping audio**")
         debug_print('[Bot] %s requested stop command. Stoping audio...' % str(ctx.author))
         await voice.stop()
         os.remove("song.mp3")
@@ -163,6 +176,7 @@ async def stop(ctx):
         await ctx.send(":no_entry_sign:  **The audio is not playing.** %s" % ctx.author.mention)
         debug_print('[Bot] %s Requested stop, but the audio is not playing.' % ctx.author)
         return
+
 
 # ---------------------------------------------------------------
 
