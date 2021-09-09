@@ -223,6 +223,44 @@ async def ban(ctx, member : discord.Member, *, reason=None):
     await member.kick(reason=reason)
     await ctx.send("%s has been banned." % member)
 
+@client.command()
+@commands.check_any(commands.is_owner(), check_waifu(), check_server_owner())
+async def mute(ctx, member : discord.Member, *, reason = "Unknown."):
+    await member.edit(mute=True)
+    embed = discord.Embed(title="User muted", description="**%s** was muted by **%s**\n**Reason:** %s" % (member.display_name, ctx.author.display_name, reason), color=0xff1111)
+    await ctx.send(embed=embed)
+
+@mute.error
+async def mute_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send(':warning: **Missing required arguments. Usage:**  `n!mute <username>`')
+        debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
+    elif isinstance(error, commands.MemberNotFound):
+        await ctx.send(':warning: **Member not found. Make sure you don\'t use nicknames.**')
+        debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
+    elif isinstance(error, commands.CheckFailure):
+        await ctx.send(':warning: **You don\'t have the permissions to do that, %s.**' % ctx.author.mention)
+        debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
+
+@client.command()
+@commands.check_any(commands.is_owner(), check_waifu(), check_server_owner())
+async def unmute(ctx, *, member : discord.Member):
+    await member.edit(mute=False)
+    embed = discord.Embed(title="User muted", description="**%s** was unmuted by **%s**" % (member.display_name, ctx.author.display_name), color=0x11ff11)
+    await ctx.send(embed=embed)
+
+@unmute.error
+async def play_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send(':warning: **Missing required arguments. Usage:**  `n!unmute <username>`')
+        debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
+    elif isinstance(error, commands.MemberNotFound):
+        await ctx.send(':warning: **Member not found. Make sure you don\'t use nicknames.**')
+        debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
+    elif isinstance(error, commands.CheckFailure):
+        await ctx.send(':warning: **You don\'t have the permissions to do that, %s.**' % ctx.author.mention)
+        debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
+
 # ---------------------------------------------------------------
 
 @client.event
