@@ -13,8 +13,9 @@
 This commands will only work if you are the bot owner or if you are in the whitelist.
 * `n!kick @someone` to kick a user.
 * `n!ban @someone` to ban a user.
-* `n!mute @someone` to mute a user.
-* `n!unmute @someone` to unmute a user.
+* `n!mute @someone` to mute a user. Also `n!m`.
+* `n!unmute @someone` to unmute a user. Also `n!um`.
+* `n!purge @someone <messages_to_check>` will check X messages, and will delete them if the author is the specified user. Also `n!clean`.
 ### Misc:
 * `ping` to make sure it works
 * Detects if a message contains `uwu`, then screams.
