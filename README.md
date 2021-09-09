@@ -10,8 +10,11 @@
 * `n!resume` - Resumes the audio.
 * `n!stop` - Stops the audio without leaving the channel.
 ### Administration:
-* `n!kick @someone` to kick a user (only works if you are the bot owner or if you are in the whitelist)
-* `n!ban @someone` to ban a user (only works if you are the bot owner or if you are in the whitelist)
+This commands will only work if you are the bot owner or if you are in the whitelist.
+* `n!kick @someone` to kick a user.
+* `n!ban @someone` to ban a user.
+* `n!mute @someone` to mute a user.
+* `n!unmute @someone` to unmute a user.
 ### Misc:
 * `ping` to make sure it works
 * Detects if a message contains `uwu`, then screams.
