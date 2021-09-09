@@ -102,8 +102,9 @@ async def play_error(ctx, error):
         await ctx.send(':warning: **Missing required arguments. Usage:**  `n!play <url>`')
         debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
 
+
 @client.command()
-async def join(ctx):
+async def join(ctx):  # Join the same channel as the user
     if ctx.author.voice is None:
         await ctx.send(":warning:  **I can't find your channel,** %s" % ctx.author.mention)
         debug_print('Could not find channel for user: %s' % ctx.author)
@@ -113,7 +114,7 @@ async def join(ctx):
         voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
         if voice == None:
             await voiceChannel.connect()
-            await ctx.send(":ballot_box_with_check:  **Joined channel `%s`**" % str(ctx.author.voice.channel))
+            await ctx.send(":ballot_box_with_check:  **Joined channel `%s`**" % str(voiceChannel))
             debug_print('[Bot] %s requested join command. Joined channel %s.' % (str(ctx.author), str(voiceChannel)))
         else:
             await ctx.send(":warning:  **I am in that channel you fucking piece of shit.** %s" % ctx.author.mention)
@@ -122,14 +123,31 @@ async def join(ctx):
 
 
 @client.command()
+async def join_channel(ctx, *, channel : str):  # Join custom channel
+    voiceChannel = discord.utils.get(ctx.guild.voice_channels, name=channel)
+    voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+    if voice == None:
+        await voiceChannel.connect()
+        await ctx.send(":ballot_box_with_check:  **Joined channel `%s`**" % str(voiceChannel))
+        debug_print('[Bot] %s requested join command. Joined channel %s.' % (str(ctx.author), str(voiceChannel)))
+    else:
+        await ctx.send(":warning:  **I am in that channel you fucking piece of shit.** %s" % ctx.author.mention)
+        debug_print('[Bot] %s Requested a song, but I am already in that channel.' % ctx.author)
+        return
+
+
+@client.command()
 async def leave(ctx):
     voiceChannel = ctx.author.voice.channel
     voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
     if voice is not None:
-        await ctx.send(":call_me:  **Leaving channel `%s`**" % str(ctx.author.voice.channel))
+        await ctx.send(":call_me:  **Leaving channel `%s`**" % str(voiceChannel))
         debug_print('[Bot] %s requested leave command. Leaving channel %s.' % (str(ctx.author), str(voiceChannel)))
         await voice.disconnect()
-        os.remove("song.mp3")
+        try:
+            os.remove("song.mp3")
+        except:
+            pass
     else:
         await ctx.send(":no_entry_sign:  **I am not in any channel.** %s" % ctx.author.mention)
         debug_print('[Bot] %s Requested leave, but I am not in a channel.' % ctx.author)
@@ -171,7 +189,10 @@ async def stop(ctx):
         await ctx.send(":no_entry:  **Stoping audio**")
         debug_print('[Bot] %s requested stop command. Stoping audio...' % str(ctx.author))
         await voice.stop()
-        os.remove("song.mp3")
+        try:
+            os.remove("song.mp3")
+        except:
+            pass
     else:
         await ctx.send(":no_entry_sign:  **The audio is not playing.** %s" % ctx.author.mention)
         debug_print('[Bot] %s Requested stop, but the audio is not playing.' % ctx.author)
@@ -229,6 +250,6 @@ async def on_message(message):
 # ---------------------------------------------------------------
 
 try:
-    client.run(TOKEN.replace("{","").replace("}",""))  # Start bot with the token from .env
+    client.run(TOKEN[1:-1])  # Start bot with the token from .env
 except KeyboardInterrupt:
     exit("\nDetected Ctrl+C. Exiting...\n")
