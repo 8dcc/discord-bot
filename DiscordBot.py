@@ -250,7 +250,7 @@ async def unmute(ctx, *, member : discord.Member):
     await ctx.send(embed=embed)
 
 @unmute.error
-async def play_error(ctx, error):
+async def unmute_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.send(':warning: **Missing required arguments. Usage:**  `n!unmute <username>`')
         debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
