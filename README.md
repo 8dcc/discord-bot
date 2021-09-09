@@ -4,6 +4,7 @@
 ### Music:
 * `n!play <url>` - Play audio in a voice channel. (The bot needs to be in the channel, see Todo)
 * `n!join` - Join the user's channel.
+* `n!join_channel <channel_name>` - Join the specified channel.
 * `n!leave` - Leaves the current channel.
 * `n!pause` - Pauses the audio.
 * `n!resume` - Resumes the audio.
