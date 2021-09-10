@@ -12,7 +12,7 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
 intents = discord.Intents().all()
-client = commands.Bot(command_prefix='n!', intents=intents)  # Your bot prefix
+client = commands.Bot(command_prefix='n!', intents=intents)
 creator_name = "YOUR_NAME#1234"
 
 # ---------------------------------------------------------------
@@ -206,29 +206,37 @@ async def stop(ctx):
         debug_print('[Bot] %s Requested stop, but the audio is not playing.' % ctx.author)
         return
 
+# ---------------------------------------------------------------
+# Whitelist
+
+whitelist = {  # Improved version. It will check if the user is in the current guild's whitelist.
+    111111111111111111:[  # Guild id 1
+        121212121212121212,  # Meber 1 from guild 1.
+        131313131313131313   # Meber 2 from guild 1.
+        ],
+    222222222222222222:[  # Guild id 2
+        242424242424242424,  # Meber 1 from guild 2.
+        252525252525252525   # Meber 2 from guild 2.
+        ]
+    }
+
+
+def check_whitelist():
+    def predicate(ctx):
+        return ctx.author.id in whitelist[int(ctx.guild.id)]
+    return commands.check(predicate)
 
 # ---------------------------------------------------------------
 # Kick and band command
 
-def check_waifu():
-    def predicate(ctx):
-        return ctx.author.id == 123123123123123123  # Whitelisted user 1
-    return commands.check(predicate)
-
-def check_server_owner():
-    def predicate(ctx):
-        return ctx.author.id == 123123123123123123  # Whitelisted user 2
-    return commands.check(predicate)
-
-
 @client.command()
-@commands.check_any(commands.is_owner(), check_waifu(), check_server_owner())
+@commands.check_any(commands.is_owner(), check_whitelist())
 async def kick(ctx, member : discord.Member, *, reason=None):
     await member.kick(reason=reason)
     await ctx.send("%s has been kicked." % member)
 
 @client.command()
-@commands.check_any(commands.is_owner(), check_waifu(), check_server_owner())
+@commands.check_any(commands.is_owner(), check_whitelist())
 async def ban(ctx, member : discord.Member, *, reason=None):
     await member.kick(reason=reason)
     await ctx.send("%s has been banned." % member)
@@ -237,7 +245,7 @@ async def ban(ctx, member : discord.Member, *, reason=None):
 # Mute and unmute commands
 
 @client.command(aliases=["m"])
-@commands.check_any(commands.is_owner(), check_waifu(), check_server_owner())
+@commands.check_any(commands.is_owner(), check_whitelist())
 async def mute(ctx, member : discord.Member, *, reason : str = "Unknown."):
     await member.edit(mute=True)
     embed = discord.Embed(title="User muted", description="**%s** was muted by **%s**\n**Reason:** %s" % (member.display_name, ctx.author.display_name, reason), color=0xff1111)
@@ -260,7 +268,7 @@ async def mute_error(ctx, error):
 
 
 @client.command(aliases=["um"])
-@commands.check_any(commands.is_owner(), check_waifu(), check_server_owner())
+@commands.check_any(commands.is_owner(), check_whitelist())
 async def unmute(ctx, *, member : discord.Member):
     await member.edit(mute=False)
     embed = discord.Embed(title="User muted", description="**%s** was unmuted by **%s**" % (member.display_name, ctx.author.display_name), color=0x11ff11)
@@ -285,7 +293,7 @@ async def unmute_error(ctx, error):
 # Deafen and undeafen commands
 
 @client.command(aliases=["d", "deaf"])
-@commands.check_any(commands.is_owner(), check_waifu(), check_server_owner())
+@commands.check_any(commands.is_owner(), check_whitelist())
 async def deafen(ctx, member : discord.Member, *, reason : str = "Unknown."):
     await member.edit(deafen=True)
     embed = discord.Embed(title="User deafen", description="**%s** was deafen by **%s**\n**Reason:** %s" % (member.display_name, ctx.author.display_name, reason), color=0xff1111)
@@ -307,7 +315,7 @@ async def deafen_error(ctx, error):
 
 
 @client.command(aliases=["ud", "undeaf"])
-@commands.check_any(commands.is_owner(), check_waifu(), check_server_owner())
+@commands.check_any(commands.is_owner(), check_whitelist())
 async def undeafen(ctx, *, member : discord.Member):
     await member.edit(deafen=False)
     embed = discord.Embed(title="User undeafen", description="**%s** was undeafen by **%s**" % (member.display_name, ctx.author.display_name), color=0x11ff11)
@@ -325,13 +333,15 @@ async def undeafen_error(ctx, error):
         await ctx.send(':warning: **You don\'t have the permissions to do that, %s.**' % ctx.author.mention)
         debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
     else:
+        await ctx.send(':warning: **I can\'t do that, is the user in a channel?**')
+        debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
         print("--------------------------------\n%s\n----------------------------------" % error)
 
 #----------------------------------------------------------------
 # Purge commands
 
 @client.command(aliases=["clean"])
-@commands.check_any(commands.is_owner(), check_waifu(), check_server_owner())
+@commands.check_any(commands.is_owner(), check_whitelist())
 async def purge(ctx, member : discord.Member, amount : int):
 
     def check_purge(check_me):
@@ -363,6 +373,39 @@ async def purge_error(ctx, error):
         print("--------------------------------\n%s\n----------------------------------" % error)
 
 # ---------------------------------------------------------------
+# Help command
+
+@client.remove_command("help")
+@client.command()
+async def help(ctx):
+
+    help_text1 = "`n!play <url>` - Play audio in a voice channel. (The bot needs to be in the channel, see Todo)\n`n!join` - Join the user's channel.\n`n!join_channel <channel_name>` - Join the specified channel.\n`n!leave` - Leaves the current channel.\n`n!pause` - Pauses the audio.\n`n!resume` - Resumes the audio.\n`n!stop` - Stops the audio without leaving the channel."
+    help_text2 = "*This commands will only work if you are the bot owner or if you are in the whitelist.*\n`n!kick @someone` to kick a user.\n`n!ban @someone` to ban a user.\n`n!mute @someone` to mute a user. Also `n!m`.\n`n!unmute @someone` to unmute a user. Also `n!um`.\n`n!deafen @someone` to deafen a user. Also `n!d`.\n`n!undeafen @someone` to undeafen a user. Also `n!ud`.\n`n!purge @someone <messages_to_check>` will check X messages, and will delete them if the author is the specified user. Also `n!clean`."
+
+    embed = discord.Embed(title="Help", url="https://example.com", color=0x1111ff)
+    embed.set_thumbnail(url="https://u.teknik.io/uazs5.png")
+    embed.add_field(name="Music", value=help_text1, inline=False)
+
+    author_is_owner = await client.is_owner(ctx.author)
+
+    if int(ctx.author.id) in whitelist[int(ctx.guild.id)] or author_is_owner:
+        embed.add_field(name="Administration", value=help_text2, inline=False)
+
+    await ctx.send(embed=embed)
+    debug_print('[Bot] User %s requested help' % ctx.author)
+
+# ---------------------------------------------------------------
+# ???
+
+@client.command()
+async def memes(ctx):
+
+    embed = discord.Embed(color=0xff1111)
+    embed.set_thumbnail(url="https://u.teknik.io/UjPuB.png")
+    await ctx.send(embed=embed)
+    #debug_print('[Bot] User %s requested memes' % ctx.author)
+
+# ---------------------------------------------------------------
 # Message events
 
 @client.event
@@ -372,7 +415,6 @@ async def on_message(message):
 
     if debug:
         debug_message = "[%s]-[%s]: %s" % (message.author, message.channel, message.content)
-        debug_print(debug_message)
 
     if message.content == "ping":
         await message.channel.send("pong")
