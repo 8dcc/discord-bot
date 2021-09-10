@@ -11,7 +11,8 @@ debug = True
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-client = commands.Bot(command_prefix='n!')  # Your bot prefix
+intents = discord.Intents().all()
+client = commands.Bot(command_prefix='n!', intents=intents)  # Your bot prefix
 creator_name = "YOUR_NAME#1234"
 
 # ---------------------------------------------------------------
@@ -245,7 +246,7 @@ async def mute(ctx, member : discord.Member, *, reason : str = "Unknown."):
 @mute.error
 async def mute_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send(':warning: **Missing required arguments. Usage:**  `n!mute <username>`')
+        await ctx.send(':warning: **Missing required arguments. Usage:**  `n!mute <username> (reason)`')
         debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
     elif isinstance(error, commands.MemberNotFound):
         await ctx.send(':warning: **Member not found. Make sure you don\'t use nicknames.**')
@@ -281,11 +282,58 @@ async def unmute_error(ctx, error):
 
 
 #----------------------------------------------------------------
+# Deafen and undeafen commands
+
+@client.command(aliases=["d", "deaf"])
+@commands.check_any(commands.is_owner(), check_waifu(), check_server_owner())
+async def deafen(ctx, member : discord.Member, *, reason : str = "Unknown."):
+    await member.edit(deafen=True)
+    embed = discord.Embed(title="User deafen", description="**%s** was deafen by **%s**\n**Reason:** %s" % (member.display_name, ctx.author.display_name, reason), color=0xff1111)
+    await ctx.send(embed=embed)
+
+@deafen.error
+async def deafen_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send(':warning: **Missing required arguments. Usage:**  `n!deafen <username> (reason)`')
+        debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
+    elif isinstance(error, commands.MemberNotFound):
+        await ctx.send(':warning: **Member not found. Make sure you don\'t use nicknames.**')
+        debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
+    elif isinstance(error, commands.CheckFailure):
+        await ctx.send(':warning: **You don\'t have the permissions to do that, %s.**' % ctx.author.mention)
+        debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
+    else:
+        print("--------------------------------\n%s\n----------------------------------" % error)
+
+
+@client.command(aliases=["ud", "undeaf"])
+@commands.check_any(commands.is_owner(), check_waifu(), check_server_owner())
+async def undeafen(ctx, *, member : discord.Member):
+    await member.edit(deafen=False)
+    embed = discord.Embed(title="User undeafen", description="**%s** was undeafen by **%s**" % (member.display_name, ctx.author.display_name), color=0x11ff11)
+    await ctx.send(embed=embed)
+
+@undeafen.error
+async def undeafen_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send(':warning: **Missing required arguments. Usage:**  `n!undeafen <username>`')
+        debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
+    elif isinstance(error, commands.MemberNotFound):
+        await ctx.send(':warning: **Member not found. Make sure you don\'t use nicknames.**')
+        debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
+    elif isinstance(error, commands.CheckFailure):
+        await ctx.send(':warning: **You don\'t have the permissions to do that, %s.**' % ctx.author.mention)
+        debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
+    else:
+        print("--------------------------------\n%s\n----------------------------------" % error)
+
+#----------------------------------------------------------------
 # Purge commands
 
 @client.command(aliases=["clean"])
 @commands.check_any(commands.is_owner(), check_waifu(), check_server_owner())
 async def purge(ctx, member : discord.Member, amount : int):
+
     def check_purge(check_me):
         return check_me.author.id == member.id
 
