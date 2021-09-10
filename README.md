@@ -23,3 +23,4 @@ This commands will only work if you are the bot owner or if you are in the white
 * Detects if a message contains `uwu`, then screams.
 ## Todo
 * Bot needs to be on a channel to play music, if you use `n!play <song>` the bot will join, but you will need to type the command again for it to work. You can use `n!join` to make the bot join the channel before using `n!play`.
+* Add a `n!help` command.
