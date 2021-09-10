@@ -15,6 +15,8 @@ This commands will only work if you are the bot owner or if you are in the white
 * `n!ban @someone` to ban a user.
 * `n!mute @someone` to mute a user. Also `n!m`.
 * `n!unmute @someone` to unmute a user. Also `n!um`.
+* `n!deafen @someone` to deafen a user. Also `n!d`.
+* `n!undeafen @someone` to undeafen a user. Also `n!ud`.
 * `n!purge @someone <messages_to_check>` will check X messages, and will delete them if the author is the specified user. Also `n!clean`.
 ### Misc:
 * `ping` to make sure it works
