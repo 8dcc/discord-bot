@@ -2,6 +2,7 @@
 **My discord bot made in python.**
 ## Features
 ### Music:
+* `n!help` - shows a help similar to this readme.
 * `n!play <url>` - Play audio in a voice channel. (The bot needs to be in the channel, see Todo)
 * `n!join` - Join the user's channel.
 * `n!join_channel <channel_name>` - Join the specified channel.
@@ -22,5 +23,5 @@ This commands will only work if you are the bot owner or if you are in the white
 * `ping` to make sure it works
 * Detects if a message contains `uwu`, then screams.
 ## Todo
-* Bot needs to be on a channel to play music, if you use `n!play <song>` the bot will join, but you will need to type the command again for it to work. You can use `n!join` to make the bot join the channel before using `n!play`.
-* Add a `n!help` command.
+- [ ] Bot needs to be on a channel to play music, if you use `n!play <song>` the bot will join, but you will need to type the command again for it to work. You can use `n!join` to make the bot join the channel before using `n!play`.
+- [X] Add a `n!help` command.
