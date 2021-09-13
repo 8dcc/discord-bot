@@ -288,6 +288,29 @@ async def unmute_error(ctx, error):
     else:
         print("--------------------------------\n%s\n----------------------------------" % error)
 
+#----------------------------------------------------------------
+# Deafen and undeafen commands
+
+@client.command(aliases=["mo"])
+@commands.check_any(commands.is_owner(), check_whitelist())
+async def move(ctx, member : discord.Member, *, channel : discord.VoiceChannel):
+    await member.move_to(channel)
+    embed = discord.Embed(title="User moved", description="**%s** was moved by **%s**" % (member.display_name, ctx.author.display_name), color=0xff1111)
+    await ctx.send(embed=embed)
+
+@move.error
+async def disconnect_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send(':warning: **Missing required arguments. Usage:**  `n!disconnect <username> <channel>`')
+        debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
+    elif isinstance(error, commands.MemberNotFound):
+        await ctx.send(':warning: **Member not found. Make sure you don\'t use nicknames.**')
+        debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
+    elif isinstance(error, commands.CheckFailure):
+        await ctx.send(':warning: **You don\'t have the permissions to do that, %s.**' % ctx.author.mention)
+        debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
+    else:
+        print("--------------------------------\n%s\n----------------------------------" % error)
 
 #----------------------------------------------------------------
 # Deafen and undeafen commands
@@ -380,7 +403,7 @@ async def purge_error(ctx, error):
 async def help(ctx):
 
     help_text1 = "`n!play <url>` - Play audio in a voice channel. (The bot needs to be in the channel, see Todo)\n`n!join` - Join the user's channel.\n`n!join_channel <channel_name>` - Join the specified channel.\n`n!leave` - Leaves the current channel.\n`n!pause` - Pauses the audio.\n`n!resume` - Resumes the audio.\n`n!stop` - Stops the audio without leaving the channel."
-    help_text2 = "*This commands will only work if you are the bot owner or if you are in the whitelist.*\n`n!kick @someone` to kick a user.\n`n!ban @someone` to ban a user.\n`n!mute @someone` to mute a user. Also `n!m`.\n`n!unmute @someone` to unmute a user. Also `n!um`.\n`n!deafen @someone` to deafen a user. Also `n!d`.\n`n!undeafen @someone` to undeafen a user. Also `n!ud`.\n`n!purge @someone <messages_to_check>` will check X messages, and will delete them if the author is the specified user. Also `n!clean`."
+    help_text2 = "*This commands will only work if you are the bot owner or if you are in the whitelist.*\n`n!kick @someone` to kick a user.\n`n!ban @someone` to ban a user.\n`n!move @someone <channel>` to move a user.\n`n!mute @someone` to mute a user. Also `n!m`.\n`n!unmute @someone` to unmute a user. Also `n!um`.\n`n!deafen @someone` to deafen a user. Also `n!d`.\n`n!undeafen @someone` to undeafen a user. Also `n!ud`.\n`n!purge @someone <messages_to_check>` will check X messages, and will delete them if the author is the specified user. Also `n!clean`."
 
     embed = discord.Embed(title="Help", url="https://example.com", color=0x1111ff)
     embed.set_thumbnail(url="https://u.teknik.io/uazs5.png")
