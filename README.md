@@ -14,6 +14,7 @@
 This commands will only work if you are the bot owner or if you are in the whitelist.
 * `n!kick @someone` to kick a user.
 * `n!ban @someone` to ban a user.
+* `n!move @someone <channel>` to move a user.
 * `n!mute @someone` to mute a user. Also `n!m`.
 * `n!unmute @someone` to unmute a user. Also `n!um`.
 * `n!deafen @someone` to deafen a user. Also `n!d`.
