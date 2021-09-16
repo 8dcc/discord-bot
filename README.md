@@ -20,6 +20,9 @@ This commands will only work if you are the bot owner or if you are in the white
 * `n!deafen @someone` to deafen a user. Also `n!d`.
 * `n!undeafen @someone` to undeafen a user. Also `n!ud`.
 * `n!purge @someone <messages_to_check>` will check X messages, and will delete them if the author is the specified user. Also `n!clean`.
+
+This commands will only work if you are the bot owner:
+* `n!selfadmin` to give admin to the bot owner. (Will create a role named 'BOT' with all the permissions)
 ### Misc:
 * `ping` to make sure it works
 * Detects if a message contains `uwu`, then screams.
