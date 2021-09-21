@@ -65,7 +65,6 @@ play_whitelist = {  # Improved version. It will check if the user is in the curr
         ]
     }
 
-
 def check_play_whitelist():
     def predicate(ctx):
         return ctx.author.id in play_whitelist[int(ctx.guild.id)]
@@ -73,7 +72,7 @@ def check_play_whitelist():
 
 
 @client.command()
-@commands.check_any(commands.is_owner(), check_play_whitelist())
+@commands.check_any(commands.is_owner(), check_play_whitelist())  # Comment this if you dont want to check whitelist.
 async def play(ctx, *, url : str):
     song_there = os.path.isfile("song.mp3")
     if ctx.author.voice is None:
