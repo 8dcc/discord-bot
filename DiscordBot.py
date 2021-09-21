@@ -1,4 +1,4 @@
-import discord, os
+import discord, os, time
 from discord.ext import commands
 from dotenv import load_dotenv
 import youtube_dl
@@ -15,6 +15,9 @@ intents = discord.Intents().all()
 client = commands.Bot(command_prefix='n!', intents=intents)
 creator_name = "YOUR_NAME#1234"
 
+discord_log_path = "/your/folder/here/discord-bot.log"
+bot_error_path = "/your/folder/here/bot-errors.log"
+
 # ---------------------------------------------------------------
 # Functions and initial settings
 
@@ -22,8 +25,17 @@ def debug_print(text):
     write_to_log = True  # Will only work if debug is true
     print(text)
     if write_to_log:
-        with open("/your/folder/here/discord-bot.log", "a") as discord_log:
+        with open(discord_log_path, "a") as discord_log:
             discord_log.write(text + "\n")
+
+def error_print(text):
+    write_to_error_log = True
+    print("----------------------------------")
+    print(text)
+    print("----------------------------------")
+    if write_to_error_log:
+        with open(bot_error_path, "a") as error_log:
+            error_log.write("=======================\n" + time.strftime("%d %b %Y - %H:%M:%S") + "\n"  + str(text) + "\n=======================\n")
 
 @client.event
 async def on_ready():
@@ -42,7 +54,26 @@ async def on_ready():
 # ---------------------------------------------------------------
 # Play command
 
+play_whitelist = {  # Improved version. It will check if the user is in the current guild's whitelist.
+    111111111111111111:[  # Guild id 1
+        121212121212121212,  # Meber 1 from guild 1.
+        131313131313131313   # Meber 2 from guild 1.
+        ],
+    222222222222222222:[  # Guild id 2
+        242424242424242424,  # Meber 1 from guild 2.
+        252525252525252525   # Meber 2 from guild 2.
+        ]
+    }
+
+
+def check_play_whitelist():
+    def predicate(ctx):
+        return ctx.author.id in play_whitelist[int(ctx.guild.id)]
+    return commands.check(predicate)
+
+
 @client.command()
+@commands.check_any(commands.is_owner(), check_play_whitelist())
 async def play(ctx, *, url : str):
     song_there = os.path.isfile("song.mp3")
     if ctx.author.voice is None:
@@ -64,6 +95,7 @@ async def play(ctx, *, url : str):
 
         ydl_opts = {
             'format': 'bestaudio/best',
+            'max_filesize': 90000000,
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': 'mp3',
@@ -76,7 +108,10 @@ async def play(ctx, *, url : str):
                 info_dict = ydl.extract_info(url, download=False)
                 await ctx.send(":musical_note:  **Playing `%s`**" % info_dict["title"])
                 debug_print('[Bot] %s requested \'%s\'.' % (str(ctx.author), url))
-                ydl.download([url])
+                try:
+                    ydl.download([url])
+                except KeyboardInterrupt:
+                    await ctx.send(":warning: **Download was interrupted by the machine.**")
             for file in os.listdir("./"):
                 if file.endswith(".mp3"):
                     os.rename(file, "song.mp3")
@@ -96,7 +131,10 @@ async def play(ctx, *, url : str):
             for file in os.listdir("./"):
                 if file.endswith(".mp3"):
                     os.rename(file, "song.mp3")
-            voice.play(discord.FFmpegPCMAudio("song.mp3"))
+            try:
+                voice.play(discord.FFmpegPCMAudio("song.mp3"))
+            except Exception as error:
+                error_print(error)
 
 
 @play.error
@@ -104,9 +142,11 @@ async def play_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await ctx.send(':warning: **Missing required arguments. Usage:**  `n!play <url>`')
         debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
+    elif isinstance(error, commands.CheckFailure):
+        await ctx.send(':warning: **You are not in the whitelist, %s.**' % ctx.author.mention)
+        debug_print('[Bot] User %s requested join_channel command, but was not in the whitelist.' % ctx.author)
     else:
-        print("--------------------------------\n%s\n----------------------------------" % error)
-
+        error_print(error)
 
 #----------------------------------------------------------------
 # Join, join_channel, leave, pause, resume and stop commands
@@ -131,6 +171,7 @@ async def join(ctx):  # Join the same channel as the user
 
 
 @client.command()
+@commands.check_any(commands.is_owner(), check_play_whitelist())
 async def join_channel(ctx, *, channel : str):  # Join custom channel
     voiceChannel = discord.utils.get(ctx.guild.voice_channels, name=channel)
     voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
@@ -143,6 +184,13 @@ async def join_channel(ctx, *, channel : str):  # Join custom channel
         debug_print('[Bot] %s Requested a song, but I am already in that channel.' % ctx.author)
         return
 
+@join_channel.error
+async def join_channel_error(ctx, error):
+    if isinstance(error, commands.CheckFailure):
+        await ctx.send(':warning: **You are not in the whitelist, %s.**' % ctx.author.mention)
+        debug_print('[Bot] User %s requested join_channel command, but was not in the whitelist.' % ctx.author)
+    else:
+        error_print(error)
 
 @client.command()
 async def leave(ctx):
@@ -206,8 +254,9 @@ async def stop(ctx):
         debug_print('[Bot] %s Requested stop, but the audio is not playing.' % ctx.author)
         return
 
+
 # ---------------------------------------------------------------
-# Whitelist
+# Kick and band command
 
 whitelist = {  # Improved version. It will check if the user is in the current guild's whitelist.
     111111111111111111:[  # Guild id 1
@@ -220,14 +269,10 @@ whitelist = {  # Improved version. It will check if the user is in the current g
         ]
     }
 
-
 def check_whitelist():
     def predicate(ctx):
         return ctx.author.id in whitelist[int(ctx.guild.id)]
     return commands.check(predicate)
-
-# ---------------------------------------------------------------
-# Kick and band command
 
 @client.command()
 @commands.check_any(commands.is_owner(), check_whitelist())
@@ -263,8 +308,7 @@ async def mute_error(ctx, error):
         await ctx.send(':warning: **You don\'t have the permissions to do that, %s.**' % ctx.author.mention)
         debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
     else:
-        print("--------------------------------\n%s\n----------------------------------" % error)
-
+        error_print(error)
 
 
 @client.command(aliases=["um"])
@@ -286,7 +330,7 @@ async def unmute_error(ctx, error):
         await ctx.send(':warning: **You don\'t have the permissions to do that, %s.**' % ctx.author.mention)
         debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
     else:
-        print("--------------------------------\n%s\n----------------------------------" % error)
+        error_print(error)
 
 #----------------------------------------------------------------
 # Deafen and undeafen commands
@@ -310,7 +354,7 @@ async def disconnect_error(ctx, error):
         await ctx.send(':warning: **You don\'t have the permissions to do that, %s.**' % ctx.author.mention)
         debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
     else:
-        print("--------------------------------\n%s\n----------------------------------" % error)
+        error_print(error)
 
 #----------------------------------------------------------------
 # Deafen and undeafen commands
@@ -334,7 +378,7 @@ async def deafen_error(ctx, error):
         await ctx.send(':warning: **You don\'t have the permissions to do that, %s.**' % ctx.author.mention)
         debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
     else:
-        print("--------------------------------\n%s\n----------------------------------" % error)
+        error_print(error)
 
 
 @client.command(aliases=["ud", "undeaf"])
@@ -358,7 +402,7 @@ async def undeafen_error(ctx, error):
     else:
         await ctx.send(':warning: **I can\'t do that, is the user in a channel?**')
         debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
-        print("--------------------------------\n%s\n----------------------------------" % error)
+        error_print(error)
 
 #----------------------------------------------------------------
 # Purge commands
@@ -393,7 +437,7 @@ async def purge_error(ctx, error):
         await ctx.send(':warning: **You don\'t have the permissions to do that, %s.**' % ctx.author.mention)
         debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
     else:
-        print("--------------------------------\n%s\n----------------------------------" % error)
+        error_print(error)
 
 # ---------------------------------------------------------------
 # Help command
@@ -403,7 +447,7 @@ async def purge_error(ctx, error):
 async def help(ctx):
 
     help_text1 = "`n!play <url>` - Play audio in a voice channel. (The bot needs to be in the channel, see Todo)\n`n!join` - Join the user's channel.\n`n!join_channel <channel_name>` - Join the specified channel.\n`n!leave` - Leaves the current channel.\n`n!pause` - Pauses the audio.\n`n!resume` - Resumes the audio.\n`n!stop` - Stops the audio without leaving the channel."
-    help_text2 = "*This commands will only work if you are the bot owner or if you are in the whitelist.*\n`n!kick @someone` to kick a user.\n`n!ban @someone` to ban a user.\n`n!move @someone <channel>` to move a user.\n`n!mute @someone` to mute a user. Also `n!m`.\n`n!unmute @someone` to unmute a user. Also `n!um`.\n`n!deafen @someone` to deafen a user. Also `n!d`.\n`n!undeafen @someone` to undeafen a user. Also `n!ud`.\n`n!purge @someone <messages_to_check>` will check X messages, and will delete them if the author is the specified user. Also `n!clean`."
+    help_text2 = "*This commands will only work if you are the bot owner or if you are in the whitelist.*\n`n!kick @someone` to kick a user.\n`n!ban @someone` to ban a user.\n`n!mute @someone` to mute a user. Also `n!m`.\n`n!unmute @someone` to unmute a user. Also `n!um`.\n`n!deafen @someone` to deafen a user. Also `n!d`.\n`n!undeafen @someone` to undeafen a user. Also `n!ud`.\n`n!purge @someone <messages_to_check>` will check X messages, and will delete them if the author is the specified user. Also `n!clean`."
 
     embed = discord.Embed(title="Help", url="https://example.com", color=0x1111ff)
     embed.set_thumbnail(url="https://u.teknik.io/uazs5.png")
@@ -426,7 +470,7 @@ async def memes(ctx):
     embed = discord.Embed(color=0xff1111)
     embed.set_thumbnail(url="https://u.teknik.io/UjPuB.png")
     await ctx.send(embed=embed)
-    #debug_print('[Bot] User %s requested memes' % ctx.author)
+    #debug_print('[Bot] User %s requested help' % ctx.author)
 
 # ---------------------------------------------------------------
 # AM
@@ -449,7 +493,7 @@ async def selfadmin_error(ctx, error):
     else:
         await ctx.send(':warning: **I can\'t do that.**')
         debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
-        print("--------------------------------\n%s\n----------------------------------" % error)
+        error_print(error)
 
 # ---------------------------------------------------------------
 # Message events
@@ -461,6 +505,7 @@ async def on_message(message):
 
     if debug:
         debug_message = "[%s]-[%s]: %s" % (message.author, message.channel, message.content)
+        debug_print(debug_message)
 
     if message.content == "ping":
         await message.channel.send("pong")
