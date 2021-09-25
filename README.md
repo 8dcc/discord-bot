@@ -26,6 +26,9 @@ This commands will only work if you are the bot owner:
 ### Misc:
 * `ping` to make sure it works
 * Detects if a message contains `uwu`, then screams.
+* Leaves the channel if alone for 30 seconnds.
+* Has a `n!play` blacklist in case someone listens to k-pop.
+* Has a whitelist for administration commands (Checks the whitelist instead of the role).
 ## Todo
 - [X] Bot needs to be on a channel to play music, if you use `n!play <song>` the bot will join, but you will need to type the command again for it to work. You can use `n!join` to make the bot join the channel before using `n!play`.
 - [X] Add a `n!help` command.
