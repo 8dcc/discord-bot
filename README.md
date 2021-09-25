@@ -1,5 +1,16 @@
 # Discord bot
-**My discord bot made in python.**
+
+<p>
+  <b>My discord bot made in python.</b>
+  
+  <a target="_blank" href="https://github.com/r4v10l1/discord-bot">
+    <img align="right" height="75em" src="Images/Discord.png" alt="Discord logo" />
+  </a>
+</p>
+
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+
 ## Features
 ### Music:
 * `n!help` - shows a help similar to this readme.
@@ -39,3 +50,8 @@ This commands will only work if you are the bot owner:
 * [discord_purge2.py](https://gist.github.com/r4v10l1/c684325e461d70c06b76277aedfe08d8) - Discord bot purge 2.
 * [discord_purge3.py](https://gist.github.com/r4v10l1/c6af5d4149c0d6c04d4b8f94887a2ae3) - Discord bot purge 3.
 * [check_inactive.py](https://gist.github.com/r4v10l1/0793c5e2d37bf77d5f279643f03d6112) - Check if the bot is alone in a channel for X secconds.
+
+[forks-shield]: https://img.shields.io/github/forks/r4v10l1/discord-bot.svg?style=for-the-badge
+[forks-url]: https://github.com/r4v10l1/discord-bot/network/members
+[stars-shield]: https://img.shields.io/github/stars/r4v10l1/discord-bot.svg?style=for-the-badge
+[stars-url]: https://github.com/r4v10l1/discord-bot/stargazers
