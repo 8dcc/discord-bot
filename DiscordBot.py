@@ -1,4 +1,4 @@
-import discord, os, time
+import discord, os, time, asyncio
 from discord.ext import commands
 from dotenv import load_dotenv
 import youtube_dl
@@ -54,26 +54,39 @@ async def on_ready():
 # ---------------------------------------------------------------
 # Play command
 
-play_whitelist = {  # Improved version. It will check if the user is in the current guild's whitelist.
-    111111111111111111:[  # Guild id 1
-        121212121212121212,  # Meber 1 from guild 1.
-        131313131313131313   # Meber 2 from guild 1.
+play_blacklist = {
+        111111111111111111:[
+            121212121212121212
         ],
-    222222222222222222:[  # Guild id 2
-        242424242424242424,  # Meber 1 from guild 2.
-        252525252525252525   # Meber 2 from guild 2.
+        213123123123123123:[
+            123123123123123123,
+            123123123123123123
         ]
     }
 
-def check_play_whitelist():
+
+def check_play_blacklist():
     def predicate(ctx):
-        return ctx.author.id in play_whitelist[int(ctx.guild.id)]
+        return ctx.author.id not in play_blacklist[int(ctx.guild.id)]
     return commands.check(predicate)
 
 
 @client.command()
-@commands.check_any(commands.is_owner(), check_play_whitelist())  # Comment this if you dont want to check whitelist.
+@commands.check_any(commands.is_owner(), check_play_blacklist())
 async def play(ctx, *, url : str):
+
+    async def check_alone():
+        voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+        while True:
+            if voice == None:
+                break
+            elif len(voice.channel.members) == 1:
+                await voice.disconnect()
+                await ctx.send(":information_source:  **Left the channel because of inactivity.**")
+                debug_print("[Bot] Disconnected from channel because of inactivity.")
+                break
+            await asyncio.sleep(30)
+
     song_there = os.path.isfile("song.mp3")
     if ctx.author.voice is None:
         await ctx.send(":warning:  **I can't find your channel,** %s" % ctx.author.mention)
@@ -91,6 +104,10 @@ async def play(ctx, *, url : str):
             await voiceChannel.connect()
             await ctx.send(":ballot_box_with_check:  **Joined channel `%s`**" % str(ctx.author.voice.channel))
             debug_print('[Bot] %s requested a song. Joined channel %s.' % (str(ctx.author), str(voiceChannel)))
+            client.loop.create_task(check_alone())
+
+            # Get voice again to play music
+            voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
 
         ydl_opts = {
             'format': 'bestaudio/best',
@@ -110,7 +127,7 @@ async def play(ctx, *, url : str):
                 try:
                     ydl.download([url])
                 except KeyboardInterrupt:
-                    await ctx.send(":warning: **Download was interrupted by the machine.**")
+                    await ctx.send(":warning:  **Download was interrupted by the machine.**")
             for file in os.listdir("./"):
                 if file.endswith(".mp3"):
                     os.rename(file, "song.mp3")
@@ -142,8 +159,8 @@ async def play_error(ctx, error):
         await ctx.send(':warning: **Missing required arguments. Usage:**  `n!play <url>`')
         debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
     elif isinstance(error, commands.CheckFailure):
-        await ctx.send(':warning: **You are not in the whitelist, %s.**' % ctx.author.mention)
-        debug_print('[Bot] User %s requested join_channel command, but was not in the whitelist.' % ctx.author)
+        await ctx.send(':warning: **You are in the blacklist, %s.**' % ctx.author.mention)
+        debug_print('[Bot] User %s requested join_channel command, but was in the blacklist.' % ctx.author)
     else:
         error_print(error)
 
@@ -156,21 +173,37 @@ async def join(ctx):  # Join the same channel as the user
         await ctx.send(":warning:  **I can't find your channel,** %s" % ctx.author.mention)
         debug_print('Could not find channel for user: %s' % ctx.author)
         return
+
+    voiceChannel = ctx.author.voice.channel
+    voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+    if voice == None:
+        await voiceChannel.connect()
+        await ctx.send(":ballot_box_with_check:  **Joined channel `%s`**" % str(voiceChannel))
+        debug_print('[Bot] %s requested join command. Joined channel %s.' % (str(ctx.author), str(voiceChannel)))
     else:
-        voiceChannel = ctx.author.voice.channel
+        await ctx.send(":warning:  **I am in that channel you fucking piece of shit.** %s" % ctx.author.mention)
+        debug_print('[Bot] %s Requested a song, but I am already in that channel.' % ctx.author)
+        print(len(voice.channel.members))
+        return
+
+    async def check_alone():
         voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
-        if voice == None:
-            await voiceChannel.connect()
-            await ctx.send(":ballot_box_with_check:  **Joined channel `%s`**" % str(voiceChannel))
-            debug_print('[Bot] %s requested join command. Joined channel %s.' % (str(ctx.author), str(voiceChannel)))
-        else:
-            await ctx.send(":warning:  **I am in that channel you fucking piece of shit.** %s" % ctx.author.mention)
-            debug_print('[Bot] %s Requested a song, but I am already in that channel.' % ctx.author)
-            return
+        while True:
+            if voice == None:
+                break
+            elif len(voice.channel.members) == 1:
+                await voice.disconnect()
+                await ctx.send(":information_source:  **Left the channel because of inactivity.**")
+                debug_print("[Bot] Disconnected from channel because of inactivity.")
+                break
+            await asyncio.sleep(30)
+
+    client.loop.create_task(check_alone())
+
 
 
 @client.command()
-@commands.check_any(commands.is_owner(), check_play_whitelist())
+@commands.check_any(commands.is_owner(), check_play_blacklist())
 async def join_channel(ctx, *, channel : str):  # Join custom channel
     voiceChannel = discord.utils.get(ctx.guild.voice_channels, name=channel)
     voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
@@ -183,17 +216,35 @@ async def join_channel(ctx, *, channel : str):  # Join custom channel
         debug_print('[Bot] %s Requested a song, but I am already in that channel.' % ctx.author)
         return
 
+    async def check_alone():
+        voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+        while True:
+            if voice == None:
+                break
+            elif len(voice.channel.members) == 1:
+                await voice.disconnect()
+                await ctx.send(":information_source:  **Left the channel because of inactivity.**")
+                debug_print("[Bot] Disconnected from channel because of inactivity.")
+                break
+            await asyncio.sleep(30)
+
+    client.loop.create_task(check_alone())
+
+
 @join_channel.error
 async def join_channel_error(ctx, error):
     if isinstance(error, commands.CheckFailure):
-        await ctx.send(':warning: **You are not in the whitelist, %s.**' % ctx.author.mention)
-        debug_print('[Bot] User %s requested join_channel command, but was not in the whitelist.' % ctx.author)
+        await ctx.send(':warning: **You are in the blacklist, %s.**' % ctx.author.mention)
+        debug_print('[Bot] User %s requested join_channel command, but he is in the blacklist.' % ctx.author)
     else:
         error_print(error)
 
 @client.command()
 async def leave(ctx):
-    voiceChannel = ctx.author.voice.channel
+    try:
+        voiceChannel = ctx.author.voice.channel
+    except Exception:
+        pass
     voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
     if voice is not None:
         await ctx.send(":call_me:  **Leaving channel `%s`**" % str(voiceChannel))
@@ -445,7 +496,7 @@ async def purge_error(ctx, error):
 @client.command()
 async def help(ctx):
 
-    help_text1 = "`n!play <url>` - Play audio in a voice channel. (The bot needs to be in the channel, see Todo)\n`n!join` - Join the user's channel.\n`n!join_channel <channel_name>` - Join the specified channel.\n`n!leave` - Leaves the current channel.\n`n!pause` - Pauses the audio.\n`n!resume` - Resumes the audio.\n`n!stop` - Stops the audio without leaving the channel."
+        help_text1 = "`n!play <url>` - Play audio in a voice channel. \n`n!join` - Join the user's channel.\n`n!join_channel <channel_name>` - Join the specified channel.\n`n!leave` - Leaves the current channel.\n`n!pause` - Pauses the audio.\n`n!resume` - Resumes the audio.\n`n!stop` - Stops the audio without leaving the channel."
     help_text2 = "*This commands will only work if you are the bot owner or if you are in the whitelist.*\n`n!kick @someone` to kick a user.\n`n!ban @someone` to ban a user.\n`n!mute @someone` to mute a user. Also `n!m`.\n`n!unmute @someone` to unmute a user. Also `n!um`.\n`n!deafen @someone` to deafen a user. Also `n!d`.\n`n!undeafen @someone` to undeafen a user. Also `n!ud`.\n`n!purge @someone <messages_to_check>` will check X messages, and will delete them if the author is the specified user. Also `n!clean`."
 
     embed = discord.Embed(title="Help", url="https://example.com", color=0x1111ff)
@@ -469,7 +520,6 @@ async def memes(ctx):
     embed = discord.Embed(color=0xff1111)
     embed.set_thumbnail(url="https://u.teknik.io/UjPuB.png")
     await ctx.send(embed=embed)
-    #debug_print('[Bot] User %s requested help' % ctx.author)
 
 # ---------------------------------------------------------------
 # AM
