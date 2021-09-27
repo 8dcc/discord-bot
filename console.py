@@ -40,13 +40,17 @@ def error_print(text):
 # ---------------------------------------------------------------
 # Help command
 
-def help_command():
+async def help_command():
     print("No help yet fuck off")
 
-async def custom_embed(ctx, title, url, color, thumbnail, description):
+async def custom_embed(channel_id, title, url, color, thumbnail, description):
+    color = discord.Color(value=int(color, 16))
+
     embed = discord.Embed(title=title, url=url, description=description, color=color)
     embed.set_thumbnail(url=thumbnail)
-    await ctx.send(embed=embed)
+
+    channel = client.get_channel(int(channel_id))
+    await channel.send(embed=embed)
 
 
 # ---------------------------------------------------------------
@@ -67,20 +71,30 @@ async def on_ready():
         exit("activityType error. Exiting...")
 
     while True:
-        command = input("> ")
+        try:
+            command = input("> ")
+        except KeyboardInterrupt:
+            exit(1)
         if command is "help":
             help_command()
         elif "custom_embed" in command:
+            channel_id = input("custom_embed - channel_id> ")
             embed_title = input("custom_embed - title> ")
             embed_url = input("custom_embed - url> ")
             embed_color = input("custom_embed - color> ")
             embed_thumbnail = input("custom_embed - thumbnail> ")
             embed_description = input("custom_embed - description> ")
 
-            if "0x" not in embed_color:
-                embed_color = "0x" + embed_color.strip()
+            if "0x" in embed_color:
+                embed_color = embed_color.replace("0x", "")
 
-            custom_embed(embed_title, embed_url, embed_color, embed_thumbnail, embed_description)
+            await custom_embed(channel_id, embed_title, embed_url, embed_color, embed_thumbnail, embed_description)
+        elif "clear" in command:
+            os.system("clear")
+        elif "exit" in command:
+            exit(1)
+        else:
+            print("Unknown command.")
 
 
 # ---------------------------------------------------------------
