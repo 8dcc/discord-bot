@@ -26,7 +26,8 @@ def debug_print(text):
     print(text)
     if write_to_log:
         with open(discord_log_path, "a") as discord_log:
-            discord_log.write(text + "\n")
+            if text.strip() != "":
+                discord_log.write(text + "\n")
 
 def error_print(text):
     write_to_error_log = True
@@ -505,7 +506,7 @@ async def help(ctx):
 
     author_is_owner = await client.is_owner(ctx.author)
 
-    if int(ctx.author.id) in whitelist[int(ctx.guild.id)] or author_is_owner:
+    if (author_is_owner) or ( (int(ctx.guild.id) in whitelist) and (int(ctx.author.id) in whitelist[int(ctx.guild.id)]) ):
         embed.add_field(name="Administration", value=help_text2, inline=False)
 
     await ctx.send(embed=embed)
