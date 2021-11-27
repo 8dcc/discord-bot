@@ -501,7 +501,7 @@ async def help(ctx):
     help_text2 = "*This commands will only work if you are the bot owner or if you are in the whitelist.*\n`n!kick @someone` to kick a user.\n`n!ban @someone` to ban a user.\n`n!mute @someone` to mute a user. Also `n!m`.\n`n!unmute @someone` to unmute a user. Also `n!um`.\n`n!deafen @someone` to deafen a user. Also `n!d`.\n`n!undeafen @someone` to undeafen a user. Also `n!ud`.\n`n!purge @someone <messages_to_check>` will check X messages, and will delete them if the author is the specified user. Also `n!clean`."
 
     embed = discord.Embed(title="Help", url="https://example.com", color=0x1111ff)
-    embed.set_thumbnail(url="https://u.teknik.io/uazs5.png")
+    embed.set_thumbnail(url="https://raw.githubusercontent.com/r4v10l1/discord-bot/main/Images/Discord.png")
     embed.add_field(name="Music", value=help_text1, inline=False)
 
     author_is_owner = await client.is_owner(ctx.author)
