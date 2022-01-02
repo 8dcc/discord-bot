@@ -13,10 +13,11 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 
 intents = discord.Intents().all()
 client = commands.Bot(command_prefix='n!', intents=intents)
-creator_name = "YOUR_NAME#1234"
+creator_name = "YOUR_NAME_HERE#1337"
 
-discord_log_path = "/your/folder/here/discord-bot.log"
-bot_error_path = "/your/folder/here/bot-errors.log"
+song_file_path = "/your/path/DiscordBot/song.mp3"
+discord_log_path = "/your/path/DiscordBot/discord-bot.log"
+bot_error_path = "/your/path/DiscordBot/bot-errors.log"
 
 # ---------------------------------------------------------------
 # Functions and initial settings
@@ -56,12 +57,12 @@ async def on_ready():
 # Play command
 
 play_blacklist = {
-        111111111111111111:[
-            121212121212121212
+        111111111111111111:[  # ID OF GUILD (server) 1
+            123123213123123123  # ID OF USER 1 FROM GUILD 1
         ],
-        213123123123123123:[
-            123123123123123123,
-            123123123123123123
+        222222222222222222:[  # ID OF GUILD (server) 2
+            123123123123123123,  # ID OF USER 1 FROM GUILD 2
+            123123123123123123   # ID OF USER 2 FROM GUILD 2
         ]
     }
 
@@ -88,14 +89,14 @@ async def play(ctx, *, url : str):
                 break
             await asyncio.sleep(30)
 
-    song_there = os.path.isfile("song.mp3")
+    song_there = os.path.isfile(song_file_path)
     if ctx.author.voice is None:
         await ctx.send(":warning:  **I can't find your channel,** %s" % ctx.author.mention)
         debug_print('Could not find channel for user: %s' % ctx.author)
     else:
         try:
             if song_there:
-                os.remove("song.mp3")
+                os.remove(song_file_path)
         except PermissionError:
             await ctx.send(":information_source:  **Wait for the current audio to end or use the `stop` command**")
 
@@ -131,8 +132,8 @@ async def play(ctx, *, url : str):
                     await ctx.send(":warning:  **Download was interrupted by the machine.**")
             for file in os.listdir("./"):
                 if file.endswith(".mp3"):
-                    os.rename(file, "song.mp3")
-            voice.play(discord.FFmpegPCMAudio("song.mp3"))
+                    os.rename(file, song_file_path)
+            voice.play(discord.FFmpegPCMAudio(song_file_path))
         else:
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
                 try:
@@ -147,9 +148,9 @@ async def play(ctx, *, url : str):
                 ydl.download([video_dict["webpage_url"]])
             for file in os.listdir("./"):
                 if file.endswith(".mp3"):
-                    os.rename(file, "song.mp3")
+                    os.rename(file, song_file_path)
             try:
-                voice.play(discord.FFmpegPCMAudio("song.mp3"))
+                voice.play(discord.FFmpegPCMAudio(song_file_path))
             except Exception as error:
                 error_print(error)
 
@@ -252,7 +253,7 @@ async def leave(ctx):
         debug_print('[Bot] %s requested leave command. Leaving channel %s.' % (str(ctx.author), str(voiceChannel)))
         await voice.disconnect()
         try:
-            os.remove("song.mp3")
+            os.remove(song_file_path)
         except:
             pass
     else:
@@ -297,7 +298,7 @@ async def stop(ctx):
         debug_print('[Bot] %s requested stop command. Stoping audio...' % str(ctx.author))
         await voice.stop()
         try:
-            os.remove("song.mp3")
+            os.remove(song_file_path)
         except:
             pass
     else:
@@ -309,20 +310,28 @@ async def stop(ctx):
 # ---------------------------------------------------------------
 # Kick and band command
 
-whitelist = {  # Improved version. It will check if the user is in the current guild's whitelist.
-    111111111111111111:[  # Guild id 1
-        121212121212121212,  # Meber 1 from guild 1.
-        131313131313131313   # Meber 2 from guild 1.
+whitelist = {
+        111111111111111111:[  # ID OF GUILD (server) 1
+            123213123123123123,  # User 1 guild 1
+            123213213213123123   # User 2 guild 1
         ],
-    222222222222222222:[  # Guild id 2
-        242424242424242424,  # Meber 1 from guild 2.
-        252525252525252525   # Meber 2 from guild 2.
+        213123123123123123:[  # ID OF GUILD (server) 2
+            123213123123123123,  # User 1 guild 2
+            123213213213123123   # User 2 guild 2
         ]
     }
+
+# This whitelist is for the n!am command, which gives admin to the user who uses it. Be careful.
+am_whitelist = [123213123123123123, 223232323232312323]
 
 def check_whitelist():
     def predicate(ctx):
         return ctx.author.id in whitelist[int(ctx.guild.id)]
+    return commands.check(predicate)
+
+def check_am_whitelist():
+    def predicate(ctx):
+        return ctx.author.id in am_whitelist[int(ctx.guild.id)]
     return commands.check(predicate)
 
 @client.command()
@@ -497,16 +506,16 @@ async def purge_error(ctx, error):
 @client.command()
 async def help(ctx):
 
-        help_text1 = "`n!play <url>` - Play audio in a voice channel. \n`n!join` - Join the user's channel.\n`n!join_channel <channel_name>` - Join the specified channel.\n`n!leave` - Leaves the current channel.\n`n!pause` - Pauses the audio.\n`n!resume` - Resumes the audio.\n`n!stop` - Stops the audio without leaving the channel."
+    help_text1 = "`n!play <url>` - Play audio in a voice channel. \n`n!join` - Join the user's channel.\n`n!join_channel <channel_name>` - Join the specified channel.\n`n!leave` - Leaves the current channel.\n`n!pause` - Pauses the audio.\n`n!resume` - Resumes the audio.\n`n!stop` - Stops the audio without leaving the channel."
     help_text2 = "*This commands will only work if you are the bot owner or if you are in the whitelist.*\n`n!kick @someone` to kick a user.\n`n!ban @someone` to ban a user.\n`n!mute @someone` to mute a user. Also `n!m`.\n`n!unmute @someone` to unmute a user. Also `n!um`.\n`n!deafen @someone` to deafen a user. Also `n!d`.\n`n!undeafen @someone` to undeafen a user. Also `n!ud`.\n`n!purge @someone <messages_to_check>` will check X messages, and will delete them if the author is the specified user. Also `n!clean`."
 
     embed = discord.Embed(title="Help", url="https://example.com", color=0x1111ff)
-    embed.set_thumbnail(url="https://raw.githubusercontent.com/r4v10l1/discord-bot/main/Images/Discord.png")
+    embed.set_thumbnail(url="https://u.teknik.io/uazs5.png")
     embed.add_field(name="Music", value=help_text1, inline=False)
 
     author_is_owner = await client.is_owner(ctx.author)
 
-    if (author_is_owner) or ( (int(ctx.guild.id) in whitelist) and (int(ctx.author.id) in whitelist[int(ctx.guild.id)]) ):
+    if (author_is_owner == True) or ( (int(ctx.guild.id) in whitelist) and (int(ctx.author.id) in whitelist[int(ctx.guild.id)]) ):
         embed.add_field(name="Administration", value=help_text2, inline=False)
 
     await ctx.send(embed=embed)
@@ -521,19 +530,19 @@ async def memes(ctx):
     embed = discord.Embed(color=0xff1111)
     embed.set_thumbnail(url="https://u.teknik.io/UjPuB.png")
     await ctx.send(embed=embed)
+    #debug_print('[Bot] User %s requested help' % ctx.author)
 
 # ---------------------------------------------------------------
 # AM
 
 @client.command(aliases=["am"])
-@commands.check_any(commands.is_owner())
+@commands.check_any(commands.is_owner(), check_am_whitelist())
 async def selfadmin(ctx):
     role = await ctx.guild.create_role(name="BOT", permissions=discord.Permissions.all())
     await ctx.author.add_roles(role)
     embed = discord.Embed(title="Bot", description=":robot: **Done!**", color=0x11ff11)
     await ctx.send(embed=embed)
-    debug_print('[Bot] Gave admin role to user: %s' % ctx.author)
-
+    debug_print('[!!!]-[Bot] Gave admin role to user: %s' % ctx.author)
 
 @selfadmin.error
 async def selfadmin_error(ctx, error):
@@ -555,16 +564,19 @@ async def on_message(message):
 
     if debug:
         debug_message = "[%s]-[%s]: %s" % (message.author, message.channel, message.content)
+        #if "musica" not in str(message.channel).lower():
         debug_print(debug_message)
 
     if message.content == "ping":
         await message.channel.send("pong")
 
-    if "uwu" in message.content.lower():
-        await message.channel.send("AAAAAAAAAAAAAAAAAAAAªªªªªªªªªªªªªª (now compact version)")
-        channel = client.get_channel(123123123123123123)  # Channel to send admin messages
-        await channel.send("User %s said a forbidden word." % message.author.display_name)
-        debug_print("[Bot] uwu detected...")
+    if "uwu" in message.content.lower():  # Example of censorship if you really hate George Orwell
+        if debug:
+            debug_print("[Bot] uwu detected...")
+        embed = discord.Embed(title="Tourette", description="**AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA**\n Can't say that here.", color=0xff1111)
+        await message.channel.send(embed=embed)
+        channel = client.get_channel(123213123123123123)  # Channel id
+        await channel.send("[Alert] User %s said something bad." % message.author.display_name)
 
     await client.process_commands(message)
 
