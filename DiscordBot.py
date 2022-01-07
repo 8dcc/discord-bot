@@ -595,8 +595,7 @@ async def on_message(message):
     if message.content == "ping":
         await message.channel.send("pong")
 
-    if "uwu-is-disabled" in message.content.lower():
-        if debug:
+    if "uwu" in message.content.lower():  # Example of censorship if you really hate George Orwell        if debug:
             debug_print("[Bot] uwu detected...")
         embed = discord.Embed(title="Tourette", description="**AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA**\n Can't say that here.", color=0xff1111)
         await message.channel.send(embed=embed)
