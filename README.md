@@ -31,6 +31,7 @@ This commands will only work if you are the bot owner or if you are in the white
 * `n!deafen @someone` to deafen a user. Also `n!d`.
 * `n!undeafen @someone` to undeafen a user. Also `n!ud`.
 * `n!purge @someone <messages_to_check>` will check X messages, and will delete them if the author is the specified user. Also `n!clean`.
+* `n!spam <amount> <message>` will spam the specified messae in the current channel the amount of times.
 
 This commands will only work if you are the bot owner or you are in the am whitelist:
 * `n!am` if you want to know about this one, check the code yourself :)
