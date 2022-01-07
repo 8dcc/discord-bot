@@ -393,7 +393,7 @@ async def unmute_error(ctx, error):
         error_print(error)
 
 #----------------------------------------------------------------
-# Deafen and undeafen commands
+# Move command
 
 @client.command(aliases=["mo"])
 @commands.check_any(commands.is_owner(), check_whitelist())
@@ -465,7 +465,7 @@ async def undeafen_error(ctx, error):
         error_print(error)
 
 #----------------------------------------------------------------
-# Purge commands
+# Purge command
 
 @client.command(aliases=["clean"])
 @commands.check_any(commands.is_owner(), check_whitelist())
@@ -476,7 +476,7 @@ async def purge(ctx, member : discord.Member, amount : int):
 
     if amount <= 0:
         await ctx.send(':warning: **Missing required arguments. Usage:**  `n!purge <username> <message_amount>`')
-        debug_print('[Bot] Could not parse negative integer for user: %s' % ctx.author)
+        debug_print('[Bot] Could not parse negative integer in purge for user: %s' % ctx.author)
         return
 
     deleted = await ctx.channel.purge(limit=amount, check=check_purge)
@@ -499,6 +499,33 @@ async def purge_error(ctx, error):
     else:
         error_print(error)
 
+#----------------------------------------------------------------
+# Spam command
+
+@client.command()
+@commands.check_any(commands.is_owner(), check_whitelist())
+async def spam(ctx, amount : int, *, message2send : str):  #TODO
+    if amount < 1:
+        await ctx.send(':warning: **Missing required arguments. Usage:**  `n!spam <ammount> <message>`')
+        debug_print('[Bot] Could not parse negative integer in spam for user: %s' % ctx.author)
+        return
+
+    for n in range(amount):
+        await ctx.send(message2send)
+
+    debug_print('[Bot] User %s requested spam. Spamming %s times the message: %s' % (ctx.author, amount, message2send))
+
+@spam.error
+async def spam_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send(':warning: **Missing required arguments. Usage:**  `n!spam <amount> <message>`')
+        debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
+    elif isinstance(error, commands.CheckFailure):
+        await ctx.send(':warning: **You don\'t have the permissions to do that, %s.**' % ctx.author.mention)
+        debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
+    else:
+        error_print(error)
+
 # ---------------------------------------------------------------
 # Help command
 
@@ -509,7 +536,7 @@ async def help(ctx):
     help_text1 = "`n!play <url>` - Play audio in a voice channel. \n`n!join` - Join the user's channel.\n`n!join_channel <channel_name>` - Join the specified channel.\n`n!leave` - Leaves the current channel.\n`n!pause` - Pauses the audio.\n`n!resume` - Resumes the audio.\n`n!stop` - Stops the audio without leaving the channel."
     help_text2 = "*This commands will only work if you are the bot owner or if you are in the whitelist.*\n`n!kick @someone` to kick a user.\n`n!ban @someone` to ban a user.\n`n!mute @someone` to mute a user. Also `n!m`.\n`n!unmute @someone` to unmute a user. Also `n!um`.\n`n!deafen @someone` to deafen a user. Also `n!d`.\n`n!undeafen @someone` to undeafen a user. Also `n!ud`.\n`n!purge @someone <messages_to_check>` will check X messages, and will delete them if the author is the specified user. Also `n!clean`."
 
-    embed = discord.Embed(title="Help", url="https://example.com", color=0x1111ff)
+    embed = discord.Embed(title="Help", url="https://github.com/r4v10l1/discord-bot/blob/main/README.md", color=0x1111ff)
     embed.set_thumbnail(url="https://u.teknik.io/uazs5.png")
     embed.add_field(name="Music", value=help_text1, inline=False)
 
@@ -530,7 +557,6 @@ async def memes(ctx):
     embed = discord.Embed(color=0xff1111)
     embed.set_thumbnail(url="https://u.teknik.io/UjPuB.png")
     await ctx.send(embed=embed)
-    #debug_print('[Bot] User %s requested help' % ctx.author)
 
 # ---------------------------------------------------------------
 # AM
@@ -563,14 +589,13 @@ async def on_message(message):
         return
 
     if debug:
-        debug_message = "[%s]-[%s]: %s" % (message.author, message.channel, message.content)
-        #if "musica" not in str(message.channel).lower():
+        debug_message = "[%s/%s]-[%s]: %s" % (message.author.guild.name, message.channel, message.author, message.content)
         debug_print(debug_message)
 
     if message.content == "ping":
         await message.channel.send("pong")
 
-    if "uwu" in message.content.lower():  # Example of censorship if you really hate George Orwell
+    if "uwu-is-disabled" in message.content.lower():
         if debug:
             debug_print("[Bot] uwu detected...")
         embed = discord.Embed(title="Tourette", description="**AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA**\n Can't say that here.", color=0xff1111)
