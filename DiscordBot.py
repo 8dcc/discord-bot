@@ -13,9 +13,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 
 intents = discord.Intents().all()
 client = commands.Bot(command_prefix='n!', intents=intents)
-creator_name = "YOUR_NAME_HERE#1337"
 
-song_file_path = "/your/path/DiscordBot/song.mp3"
 discord_log_path = "/your/path/DiscordBot/discord-bot.log"
 bot_error_path = "/your/path/DiscordBot/bot-errors.log"
 
@@ -89,19 +87,13 @@ async def play(ctx, *, url : str):
                 break
             await asyncio.sleep(30)
 
-    song_there = os.path.isfile(song_file_path)
     if ctx.author.voice is None:
         await ctx.send(":warning:  **I can't find your channel,** %s" % ctx.author.mention)
         debug_print('Could not find channel for user: %s' % ctx.author)
     else:
-        try:
-            if song_there:
-                os.remove(song_file_path)
-        except PermissionError:
-            await ctx.send(":information_source:  **Wait for the current audio to end or use the `stop` command**")
-
         voiceChannel = ctx.author.voice.channel
         voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+
         if voice is None:
             await voiceChannel.connect()
             await ctx.send(":ballot_box_with_check:  **Joined channel `%s`**" % str(ctx.author.voice.channel))
@@ -111,8 +103,14 @@ async def play(ctx, *, url : str):
             # Get voice again to play music
             voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
 
+        if voice.is_playing():
+            await ctx.send(":information_source:  **Wait for the current audio to end or use the `stop` command**")
+            debug_print("[Bot] %s requested play for \'%s\' but I am playing a song." % (str(ctx.author), url))
+            return
+
         ydl_opts = {
             'format': 'bestaudio/best',
+            'noplaylist': 'true',
             'max_filesize': 90000000,
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio',
@@ -121,38 +119,31 @@ async def play(ctx, *, url : str):
             }],
         }
 
+        ffmpeg_options = {
+            'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
+            'options': '-vn'
+        }
+
         if "youtube.com" in url or ".mp3" in url:
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
                 info_dict = ydl.extract_info(url, download=False)
-                await ctx.send(":musical_note:  **Playing `%s`**" % info_dict["title"])
-                debug_print('[Bot] %s requested \'%s\'.' % (str(ctx.author), url))
-                try:
-                    ydl.download([url])
-                except KeyboardInterrupt:
-                    await ctx.send(":warning:  **Download was interrupted by the machine.**")
-            for file in os.listdir("./"):
-                if file.endswith(".mp3"):
-                    os.rename(file, song_file_path)
-            voice.play(discord.FFmpegPCMAudio(song_file_path))
+            await ctx.send(":musical_note:  **Playing `%s`**" % info_dict['title'])
+            debug_print("[Bot] %s requested play for \'%s\'." % (str(ctx.author), url))
+            voice.play(discord.FFmpegPCMAudio(info_dict['url'], **ffmpeg_options))
+            voice.is_playing()
         else:
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
                 try:
-                    get(url)
+                   get(url)
                 except:
-                    video_dict = ydl.extract_info("ytsearch:%s" % url, download=False)['entries'][0]
+                   info_dict = ydl.extract_info("ytsearch:%s" % url, download=False)['entries'][0]
                 else:
-                    video_dict = ydl.extract_info(url, download = False)
+                   info_dict = ydl.extract_info(url, download=False)
 
-                await ctx.send(":musical_note:  **Playing `%s`**" % video_dict["title"])
-                debug_print('[Bot] %s requested \'%s\'.' % (str(ctx.author), video_dict["webpage_url"]))
-                ydl.download([video_dict["webpage_url"]])
-            for file in os.listdir("./"):
-                if file.endswith(".mp3"):
-                    os.rename(file, song_file_path)
-            try:
-                voice.play(discord.FFmpegPCMAudio(song_file_path))
-            except Exception as error:
-                error_print(error)
+            await ctx.send(":musical_note:  **Playing `%s`**" % info_dict['title'])
+            debug_print("[Bot] %s requested play search for \'%s\' (%s)." % (str(ctx.author), url, info_dict['webpage_url']))
+            voice.play(discord.FFmpegPCMAudio(info_dict['url'], **ffmpeg_options))
+            voice.is_playing()
 
 
 @play.error
@@ -465,7 +456,7 @@ async def undeafen_error(ctx, error):
         error_print(error)
 
 #----------------------------------------------------------------
-# Purge command
+# Purge commands
 
 @client.command(aliases=["clean"])
 @commands.check_any(commands.is_owner(), check_whitelist())
@@ -533,11 +524,11 @@ async def spam_error(ctx, error):
 @client.command()
 async def help(ctx):
 
-    help_text1 = "`n!play <url>` - Play audio in a voice channel. \n`n!join` - Join the user's channel.\n`n!join_channel <channel_name>` - Join the specified channel.\n`n!leave` - Leaves the current channel.\n`n!pause` - Pauses the audio.\n`n!resume` - Resumes the audio.\n`n!stop` - Stops the audio without leaving the channel."
+    help_text1 = "`n!play <url>` - Play audio in a voice channel (.mp3 url, youtube url or youtube search). \n`n!join` - Join the user's channel.\n`n!join_channel <channel_name>` - Join the specified channel.\n`n!leave` - Leaves the current channel.\n`n!pause` - Pauses the audio.\n`n!resume` - Resumes the audio.\n`n!stop` - Stops the audio without leaving the channel."
     help_text2 = "*This commands will only work if you are the bot owner or if you are in the whitelist.*\n`n!kick @someone` to kick a user.\n`n!ban @someone` to ban a user.\n`n!mute @someone` to mute a user. Also `n!m`.\n`n!unmute @someone` to unmute a user. Also `n!um`.\n`n!deafen @someone` to deafen a user. Also `n!d`.\n`n!undeafen @someone` to undeafen a user. Also `n!ud`.\n`n!purge @someone <messages_to_check>` will check X messages, and will delete them if the author is the specified user. Also `n!clean`.\n`n!spam <amount> <message>` will spam the specified messae in the current channel the amount of times."
 
     embed = discord.Embed(title="Help", url="https://github.com/r4v10l1/discord-bot/blob/main/README.md", color=0x1111ff)
-    embed.set_thumbnail(url="https://u.teknik.io/uazs5.png")
+    embed.set_thumbnail(url="https://u.teknik.io/m3lTR.png")  # uazs5
     embed.add_field(name="Music", value=help_text1, inline=False)
 
     author_is_owner = await client.is_owner(ctx.author)
@@ -553,7 +544,6 @@ async def help(ctx):
 
 @client.command()
 async def memes(ctx):
-
     embed = discord.Embed(color=0xff1111)
     embed.set_thumbnail(url="https://u.teknik.io/UjPuB.png")
     await ctx.send(embed=embed)
@@ -585,7 +575,7 @@ async def selfadmin_error(ctx, error):
 
 @client.event
 async def on_message(message):
-    if message.author == client.user:
+    if message.author == client.user or message.content.strip() == "":
         return
 
     if debug:
@@ -595,11 +585,12 @@ async def on_message(message):
     if message.content == "ping":
         await message.channel.send("pong")
 
-    if "uwu" in message.content.lower():  # Example of censorship if you really hate George Orwell        if debug:
+    if "uwu" in message.content.lower():
+        if debug:
             debug_print("[Bot] uwu detected...")
         embed = discord.Embed(title="Tourette", description="**AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA**\n Can't say that here.", color=0xff1111)
         await message.channel.send(embed=embed)
-        channel = client.get_channel(123213123123123123)  # Channel id
+        embed = discord.Embed(title="Tourette", description="**AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA**\n Can't say that here.", color=0xff1111)
         await channel.send("[Alert] User %s said something bad." % message.author.display_name)
 
     await client.process_commands(message)
