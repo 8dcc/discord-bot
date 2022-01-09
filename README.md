@@ -14,7 +14,7 @@
 ## Features
 ### Music:
 * `n!help` - shows a help similar to this readme.
-* `n!play <url>` - Play audio in a voice channel.
+* `n!play <url>` - Play audio in a voice channel (.mp3 url, youtube url or youtube search).
 * `n!join` - Join the user's channel.
 * `n!join_channel <channel_name>` - Join the specified channel.
 * `n!leave` - Leaves the current channel.
@@ -45,6 +45,8 @@ This commands will only work if you are the bot owner or you are in the am white
 ## Todo
 - [X] Bot needs to be on a channel to play music, if you use `n!play <song>` the bot will join, but you will need to type the command again for it to work. You can use `n!join` to make the bot join the channel before using `n!play`.
 - [X] Add a `n!help` command.
+- [X] Make the bot "stream" the songs instead of downloading them.
+- [ ] Add queue system.
 - [ ] Wanna play blackjack with the bot  **:^)**
 
 ## Related gists
