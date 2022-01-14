@@ -83,7 +83,7 @@ async def play(ctx, *, url : str):
             elif len(voice.channel.members) == 1:
                 await voice.disconnect()
                 await ctx.send(":information_source:  **Left the channel because of inactivity.**")
-                debug_print("[Bot] Disconnected from channel because of inactivity.")
+                debug_print("[Bot] Disconnected from channel '%s/%s' because of inactivity." % (str(ctx.guild), str(voice.channel)))
                 break
             await asyncio.sleep(30)
 
@@ -145,7 +145,9 @@ async def play(ctx, *, url : str):
             voice.play(discord.FFmpegPCMAudio(info_dict['url'], **ffmpeg_options))
             voice.is_playing()
         except Exception as e:
-            await ctx.send(":warning: **There was an error playing that song...**")
+            #await ctx.send(":warning: **There was an error playing that song...**")
+            embed = discord.Embed(title="Error", description="**There was an error playing that song.**\nSee possibe errors [here](https://github.com/r4v10l1/discord-bot#possible-errors).", color=0xff1111)
+            await ctx.send(embed=embed)
             error_print(e)
 
 
@@ -158,6 +160,8 @@ async def play_error(ctx, error):
         await ctx.send(':warning: **You are in the blacklist, %s.**' % ctx.author.mention)
         debug_print('[Bot] User %s requested join_channel command, but was in the blacklist.' % ctx.author)
     else:
+        embed = discord.Embed(title="Error", description="**There was an error playing that song.**\nSee possibe errors [here](https://github.com/r4v10l1/discord-bot#possible-errors).", color=0xff1111)
+        await ctx.send(embed=embed)
         error_print(error)
 
 #----------------------------------------------------------------
@@ -190,7 +194,7 @@ async def join(ctx):  # Join the same channel as the user
             elif len(voice.channel.members) == 1:
                 await voice.disconnect()
                 await ctx.send(":information_source:  **Left the channel because of inactivity.**")
-                debug_print("[Bot] Disconnected from channel because of inactivity.")
+                debug_print("[Bot] Disconnected from channel '%s/%s' because of inactivity." % (str(ctx.guild), str(voice.channel)))
                 break
             await asyncio.sleep(30)
 
@@ -220,7 +224,7 @@ async def join_channel(ctx, *, channel : str):  # Join custom channel
             elif len(voice.channel.members) == 1:
                 await voice.disconnect()
                 await ctx.send(":information_source:  **Left the channel because of inactivity.**")
-                debug_print("[Bot] Disconnected from channel because of inactivity.")
+                debug_print("[Bot] Disconnected from channel '%s/%s' because of inactivity." % (str(ctx.guild), str(voice.channel)))
                 break
             await asyncio.sleep(30)
 
