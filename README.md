@@ -46,6 +46,7 @@ This commands will only work if you are the bot owner or you are in the am white
 ## Possible errors
 * The bot can't download age-restricted content.
 * The bot might fail depending on the youtube servers.
+* The bot can't play playlists right now.
 
 ## Todo
 - [X] Bot needs to be on a channel to play music, if you use `n!play <song>` the bot will join, but you will need to type the command again for it to work. You can use `n!join` to make the bot join the channel before using `n!play`.
