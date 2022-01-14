@@ -129,8 +129,6 @@ async def play(ctx, *, url : str):
                 info_dict = ydl.extract_info(url, download=False)
             await ctx.send(":musical_note:  **Playing `%s`**" % info_dict['title'])
             debug_print("[Bot] %s requested play for \'%s\'." % (str(ctx.author), url))
-            voice.play(discord.FFmpegPCMAudio(info_dict['url'], **ffmpeg_options))
-            voice.is_playing()
         else:
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
                 try:
@@ -142,8 +140,13 @@ async def play(ctx, *, url : str):
 
             await ctx.send(":musical_note:  **Playing `%s`**" % info_dict['title'])
             debug_print("[Bot] %s requested play search for \'%s\' (%s)." % (str(ctx.author), url, info_dict['webpage_url']))
+
+        try:
             voice.play(discord.FFmpegPCMAudio(info_dict['url'], **ffmpeg_options))
             voice.is_playing()
+        except Exception as e:
+            await ctx.send(":warning: **There was an error playing that song...**")
+            error_print(e)
 
 
 @play.error
@@ -239,14 +242,10 @@ async def leave(ctx):
     except Exception:
         pass
     voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
-    if voice is not None:
+    if voice != None:
         await ctx.send(":call_me:  **Leaving channel `%s`**" % str(voiceChannel))
         debug_print('[Bot] %s requested leave command. Leaving channel %s.' % (str(ctx.author), str(voiceChannel)))
         await voice.disconnect()
-        try:
-            os.remove(song_file_path)
-        except:
-            pass
     else:
         await ctx.send(":no_entry_sign:  **I am not in any channel.** %s" % ctx.author.mention)
         debug_print('[Bot] %s Requested leave, but I am not in a channel.' % ctx.author)
@@ -257,10 +256,13 @@ async def leave(ctx):
 async def pause(ctx):
     voiceChannel = ctx.author.voice.channel
     voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
-    if voice.is_playing():
+    if voice != None and voice.is_playing():
         await ctx.send(":pause_button:  **Pausing audio**")
         debug_print('[Bot] %s requested pause command. Pausing audio...' % str(ctx.author))
-        await voice.pause()
+        try:
+            await voice.pause()
+        except:
+            pass
     else:
         await ctx.send(":no_entry_sign:  **I am not playing any audio.** %s" % ctx.author.mention)
         debug_print('[Bot] %s Requested pause, but I am not playing any audio.' % ctx.author)
@@ -271,10 +273,13 @@ async def pause(ctx):
 async def resume(ctx):
     voiceChannel = ctx.author.voice.channel
     voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
-    if voice.is_paused():
+    if voice != None and voice.is_paused():
         await ctx.send(":arrow_forward:  **Resuming audio**")
         debug_print('[Bot] %s requested resume command. Resuming audio...' % str(ctx.author))
-        await voice.resume()
+        try:
+            await voice.resume()
+        except:
+            pass
     else:
         await ctx.send(":no_entry_sign:  **The audio is not paused.** %s" % ctx.author.mention)
         debug_print('[Bot] %s Requested resume, but the audio is not paused.' % ctx.author)
@@ -284,12 +289,11 @@ async def resume(ctx):
 async def stop(ctx):
     voiceChannel = ctx.author.voice.channel
     voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
-    if not voice.is_paused():
+    if not voice.is_paused() and voice != None:
         await ctx.send(":no_entry:  **Stoping audio**")
         debug_print('[Bot] %s requested stop command. Stoping audio...' % str(ctx.author))
-        await voice.stop()
         try:
-            os.remove(song_file_path)
+            await voice.stop()
         except:
             pass
     else:
@@ -590,8 +594,9 @@ async def on_message(message):
             debug_print("[Bot] uwu detected...")
         embed = discord.Embed(title="Tourette", description="**AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA**\n Can't say that here.", color=0xff1111)
         await message.channel.send(embed=embed)
-        embed = discord.Embed(title="Tourette", description="**AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA**\n Can't say that here.", color=0xff1111)
-        await channel.send("[Alert] User %s said something bad." % message.author.display_name)
+        channel = client.get_channel(12312312312312313123)
+        if channel != None:
+            await channel.send("[Alert] User %s said something bad." % message.author.display_name)
 
     await client.process_commands(message)
 
