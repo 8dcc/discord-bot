@@ -45,18 +45,19 @@ async def on_ready():
     if activityType is "Playing":
         await client.change_presence(activity=discord.Game(name="with your stepmom"))
     elif activityType is "Watching":
-        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="lots of gay porn"))
+        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="n!help"))
     elif activityType is "Listening":
-        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="hentai moans"))
+        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="your mom cry"))
     else:
         exit("activityType error. Exiting...")
 
 # ---------------------------------------------------------------
-# Play command
+# Whitelists and blacklists functions
 
 play_blacklist = {
         111111111111111111:[  # ID OF GUILD (server) 1
-            123123213123123123  # ID OF USER 1 FROM GUILD 1
+            123213123123123123,  # ID OF USER 1 FROM GUILD 1
+            123123123123123123   # ID OF USER 2 FROM GUILD 1
         ],
         222222222222222222:[  # ID OF GUILD (server) 2
             123123123123123123,  # ID OF USER 1 FROM GUILD 2
@@ -64,12 +65,53 @@ play_blacklist = {
         ]
     }
 
-
 def check_play_blacklist():
     def predicate(ctx):
         return ctx.author.id not in play_blacklist[int(ctx.guild.id)]
     return commands.check(predicate)
 
+# For administrative commands
+whitelist = {
+        111111111111111111:[  # ID OF GUILD (server) 1
+            123213123123123123,  # User 1 guild 1
+            123213213213123123   # User 2 guild 1
+        ],
+        213123123123123123:[  # ID OF GUILD (server) 2
+            123213123123123123,  # User 1 guild 2
+            123213213213123123   # User 2 guild 2
+        ]
+    }
+
+def check_whitelist():
+    def predicate(ctx):
+        return ctx.author.id in whitelist[int(ctx.guild.id)]
+    return commands.check(predicate)
+
+# This whitelist is for the n!am command, which gives admin to the user who uses it. Be careful.
+am_whitelist = [123213123123123123, 223232323232312323]
+
+def check_am_whitelist():
+    def predicate(ctx):
+        return ctx.author.id in am_whitelist[int(ctx.guild.id)]
+    return commands.check(predicate)
+
+# If a guild and user are in this whitelist, the message logging will be ignored
+message_log_blacklist = {
+        111111111111111111:[  # ID OF GUILD (server) 1
+            123215553123123123,  # ID OF USER 1 FROM GUILD 1
+            123123123123123123   # ID OF USER 2 FROM GUILD 1
+        ],
+        222222222222222222:[  # ID OF GUILD (server) 2
+            212121212312112122,  # ID OF USER 1 FROM GUILD 2
+            123123123123123123   # ID OF USER 2 FROM GUILD 2
+        ]
+    }
+
+def check_message_blacklist(user_id, guild_id):
+    return not (guild_id in message_log_blacklist and user_id in message_log_blacklist[guild_id])
+
+# ---------------------------------------------------------------
+# Play command
 
 @client.command()
 @commands.check_any(commands.is_owner(), check_play_blacklist())
@@ -308,30 +350,6 @@ async def stop(ctx):
 
 # ---------------------------------------------------------------
 # Kick and band command
-
-whitelist = {
-        111111111111111111:[  # ID OF GUILD (server) 1
-            123213123123123123,  # User 1 guild 1
-            123213213213123123   # User 2 guild 1
-        ],
-        213123123123123123:[  # ID OF GUILD (server) 2
-            123213123123123123,  # User 1 guild 2
-            123213213213123123   # User 2 guild 2
-        ]
-    }
-
-# This whitelist is for the n!am command, which gives admin to the user who uses it. Be careful.
-am_whitelist = [123213123123123123, 223232323232312323]
-
-def check_whitelist():
-    def predicate(ctx):
-        return ctx.author.id in whitelist[int(ctx.guild.id)]
-    return commands.check(predicate)
-
-def check_am_whitelist():
-    def predicate(ctx):
-        return ctx.author.id in am_whitelist[int(ctx.guild.id)]
-    return commands.check(predicate)
 
 @client.command()
 @commands.check_any(commands.is_owner(), check_whitelist())
@@ -586,7 +604,7 @@ async def on_message(message):
     if message.author == client.user or message.content.strip() == "":
         return
 
-    if debug:
+    if debug and check_message_blacklist(message.author.id, message.author.guild.id):
         debug_message = "[%s/%s]-[%s]: %s" % (message.author.guild.name, message.channel, message.author, message.content)
         debug_print(debug_message)
 
