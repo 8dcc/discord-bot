@@ -54,6 +54,7 @@ This commands will only work if you are the bot owner or you are in the am white
 - [X] Make the bot "stream" the songs instead of downloading them.
 - [ ] Add queue system.
 - [ ] Wanna play blackjack with the bot  **:^)**
+- [ ] Separate code into multiple files.
 
 ## Related gists
 * [discord_purge.py](https://gist.github.com/r4v10l1/a21360c3f92266c0b03db7cc9b73e7ff) - Discord bot purge 1.
