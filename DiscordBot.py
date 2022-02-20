@@ -56,8 +56,7 @@ async def on_ready():
 
 play_blacklist = {
         111111111111111111:[  # ID OF GUILD (server) 1
-            123213123123123123,  # ID OF USER 1 FROM GUILD 1
-            123123123123123123   # ID OF USER 2 FROM GUILD 1
+            123123213123123123  # ID OF USER 1 FROM GUILD 1
         ],
         222222222222222222:[  # ID OF GUILD (server) 2
             123123123123123123,  # ID OF USER 1 FROM GUILD 2
@@ -67,7 +66,10 @@ play_blacklist = {
 
 def check_play_blacklist():
     def predicate(ctx):
-        return ctx.author.id not in play_blacklist[int(ctx.guild.id)]
+        if int(ctx.guild.id) in play_blacklist:
+            return ctx.author.id not in play_blacklist[int(ctx.guild.id)]
+        else:
+            return True     # True by default because it's a blacklist
     return commands.check(predicate)
 
 # For administrative commands
@@ -84,7 +86,10 @@ whitelist = {
 
 def check_whitelist():
     def predicate(ctx):
-        return ctx.author.id in whitelist[int(ctx.guild.id)]
+        if int(ctx.guild.id) in whitelist:
+            return ctx.author.id in whitelist[int(ctx.guild.id)]
+        else:
+            return False
     return commands.check(predicate)
 
 # This whitelist is for the n!am command, which gives admin to the user who uses it. Be careful.
@@ -92,7 +97,10 @@ am_whitelist = [123213123123123123, 223232323232312323]
 
 def check_am_whitelist():
     def predicate(ctx):
-        return ctx.author.id in am_whitelist[int(ctx.guild.id)]
+        if int(ctx.guild.id) in play_blacklist:
+            return ctx.author.id in am_whitelist[int(ctx.guild.id)]
+        else:
+            return False
     return commands.check(predicate)
 
 # If a guild and user are in this whitelist, the message logging will be ignored
@@ -108,7 +116,10 @@ message_log_blacklist = {
     }
 
 def check_message_blacklist(user_id, guild_id):
-    return not (guild_id in message_log_blacklist and user_id in message_log_blacklist[guild_id])
+    if guild_id in message_log_blacklist:
+        return not (guild_id in message_log_blacklist and user_id in message_log_blacklist[guild_id])
+    else:
+        return True
 
 # ---------------------------------------------------------------
 # Play command
