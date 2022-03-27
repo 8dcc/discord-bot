@@ -366,13 +366,45 @@ async def stop(ctx):
 @commands.check_any(commands.is_owner(), check_whitelist())
 async def kick(ctx, member : discord.Member, *, reason=None):
     await member.kick(reason=reason)
-    await ctx.send("%s has been kicked." % member)
+    embed = discord.Embed(title="User kicked", description="**%s** was kicked by **%s**\n**Reason:** %s" % (member.display_name, ctx.author.display_name, reason), color=0xff1111)
+    await ctx.send(embed=embed)
+
+@kick.error
+async def kick_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send(':warning: **Missing required arguments. Usage:**  `n!kick <username> (reason)`')
+        debug_print('[Bot] Could not parse kick arguments for user: %s' % ctx.author)
+    elif isinstance(error, commands.MemberNotFound):
+        await ctx.send(':warning: **Member not found. Make sure you don\'t use nicknames.**')
+        debug_print('[Bot] Could not parse kick arguments for user: %s' % ctx.author)
+    elif isinstance(error, commands.CheckFailure):
+        await ctx.send(':warning: **You don\'t have the permissions to do that, %s.**' % ctx.author.mention)
+        debug_print('[Bot] Could not parse kick arguments for user: %s' % ctx.author)
+    else:
+        await ctx.send(':warning: **I can\'t do that! %s**' % ctx.autho.mention)
+        error_print(error)
 
 @client.command()
 @commands.check_any(commands.is_owner(), check_whitelist())
 async def ban(ctx, member : discord.Member, *, reason=None):
     await member.kick(reason=reason)
-    await ctx.send("%s has been banned." % member)
+    embed = discord.Embed(title="User banned", description="**%s** was banned by **%s**\n**Reason:** %s" % (member.display_name, ctx.author.display_name, reason), color=0xff1111)
+    await ctx.send(embed=embed)
+
+@ban.error
+async def ban_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send(':warning: **Missing required arguments. Usage:**  `n!ban <username> (reason)`')
+        debug_print('[Bot] Could not parse ban arguments for user: %s' % ctx.author)
+    elif isinstance(error, commands.MemberNotFound):
+        await ctx.send(':warning: **Member not found. Make sure you don\'t use nicknames.**')
+        debug_print('[Bot] Could not parse ban arguments for user: %s' % ctx.author)
+    elif isinstance(error, commands.CheckFailure):
+        await ctx.send(':warning: **You don\'t have the permissions to do that, %s.**' % ctx.author.mention)
+        debug_print('[Bot] Could not parse ban arguments for user: %s' % ctx.author)
+    else:
+        await ctx.send(':warning: **I can\'t do that! %s**' % ctx.autho.mention)
+        error_print(error)
 
 #----------------------------------------------------------------
 # Mute and unmute commands
