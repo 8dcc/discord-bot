@@ -12,6 +12,7 @@
 [![Stargazers][stars-shield]][stars-url]
 
 ## Features
+
 ### Music:
 * `n!help` - shows a help similar to this readme.
 * `n!play <url>` - Play audio in a voice channel (.mp3 url, youtube url or youtube search).
@@ -21,6 +22,7 @@
 * `n!pause` - Pauses the audio.
 * `n!resume` - Resumes the audio.
 * `n!stop` - Stops the audio without leaving the channel.
+
 ### Administration:
 This commands will only work if you are the bot owner or if you are in the whitelist.
 * `n!kick @someone` to kick a user.
@@ -35,6 +37,7 @@ This commands will only work if you are the bot owner or if you are in the white
 
 This commands will only work if you are the bot owner or you are in the am whitelist:
 * `n!am` if you want to know about this one, check the code yourself :)
+
 ### Misc:
 * `ping` to make sure it works
 * Detects if a message contains `uwu`, then screams.
@@ -42,6 +45,34 @@ This commands will only work if you are the bot owner or you are in the am white
 * Has a `n!play` blacklist in case someone listens to k-pop.
 * Has a whitelist for administration commands (Checks the whitelist instead of the role).
 * Send custom embeds to a custom channel with `console.py`.
+
+## Running the bot yourself
+First, you will need to edit the `.env` file, and replace there your bot token.
+```bash
+# .env
+DISCORD_TOKEN={YOUR_TOKEN_HERE}
+```
+You can then run the bot with docker:
+```bash
+# I am kinda new to docker so if you think it can be done better let me know
+docker build -t discord-bot
+docker run --rm -d -it discord-bot
+```
+Or run it normally:
+```bash
+# You will need to install some depencencies
+python3 -m pip install -r requirements.txt
+
+# Make it executable and start it. This script will then create a screen session
+chmod +x start-bot.sh
+./start-bot.sh
+```
+After running the bot, a screen session named `DiscordBot`.
+```bash
+screen -ls            # To list the sessions
+screen -r DiscordBot  # Resume
+# Ctrl+D + Ctrl+A to detach the session again
+```
 
 ## Possible errors
 * The bot can't download age-restricted content.
