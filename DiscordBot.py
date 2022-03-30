@@ -42,11 +42,11 @@ async def on_ready():
     print("----------------------------------------------------------------")
     print("The bot %s has connected to Discord!" % client.user)
     print("----------------------------------------------------------------")
-    if activityType is "Playing":
+    if activityType == "Playing":
         await client.change_presence(activity=discord.Game(name="with your stepmom"))
-    elif activityType is "Watching":
+    elif activityType == "Watching":
         await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="n!help"))
-    elif activityType is "Listening":
+    elif activityType == "Listening":
         await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="your mom cry"))
     else:
         exit("activityType error. Exiting...")
