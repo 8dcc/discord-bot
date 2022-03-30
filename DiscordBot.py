@@ -14,8 +14,8 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 intents = discord.Intents().all()
 client = commands.Bot(command_prefix='n!', intents=intents)
 
-discord_log_path = "/your/path/DiscordBot/discord-bot.log"
-bot_error_path = "/your/path/DiscordBot/bot-errors.log"
+discord_log_path = "discord-bot.log"
+bot_error_path = "bot-errors.log"
 
 # ---------------------------------------------------------------
 # Functions and initial settings
