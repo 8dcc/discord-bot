@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import youtube_dl
 
 ##############################
-activityType = "Watching"
+activityType = "Listening"
 debug = True
 ##############################
 
@@ -47,7 +47,7 @@ async def on_ready():
     elif activityType == "Watching":
         await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="n!help"))
     elif activityType == "Listening":
-        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="your mom cry"))
+        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="n!help"))
     else:
         exit("activityType error. Exiting...")
 
