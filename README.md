@@ -87,6 +87,7 @@ screen -r DiscordBot  # Resume
 - [ ] Wanna play blackjack with the bot  **:^)**
 - [ ] Separate code into multiple files.
 - [ ] Add autorreactions for users and guilds.
+    - [ ] Add autorreact command for appending to the json?
 - [ ] Move whitelists to json file and read it from there instead of the code (so users can edit it easily).
 - [ ] Add `n!stats` command.
     - [ ] Show uptime?
