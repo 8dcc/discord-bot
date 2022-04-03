@@ -22,6 +22,24 @@ config_path = "config/config.json"  # Used for some blacklists and all
 # ---------------------------------------------------------------
 # Functions and initial settings
 
+# Load config file as json
+with open(config_path, "r") as config_file:
+    json_data = json.loads(config_file.read())
+
+# For administrative commands
+whitelist = json_data["whitelist"]
+# Users in this dict can't use n!play
+play_blacklist = json_data["play_blacklist"]
+# This whitelist is for the n!am command. Be careful.
+am_whitelist = json_data["am_whitelist"]
+# If a guild and user are in this whitelist, the message logging will be ignored
+message_log_blacklist = json_data["message_log_blacklist"]
+# For the autoreaction feature
+autoreact_list = json_data["autoreact_list"] 
+
+# ---------------------------------------------------------------
+# Helpers
+
 def debug_print(text):
     write_to_log = True  # Will only work if debug is true
     print(text)
@@ -48,6 +66,9 @@ def bak_config_file(file_path):
     except Exception as e:
         error_print(e)
 
+# ---------------------------------------------------------------
+# When the bot loads
+
 @client.event
 async def on_ready():
     print("----------------------------------------------------------------")
@@ -65,72 +86,38 @@ async def on_ready():
 # ---------------------------------------------------------------
 # Whitelists and blacklists functions
 
-play_blacklist = {
-        111111111111111111:[  # ID OF GUILD (server) 1
-            123123213123123123  # ID OF USER 1 FROM GUILD 1
-        ],
-        222222222222222222:[  # ID OF GUILD (server) 2
-            123123123123123123,  # ID OF USER 1 FROM GUILD 2
-            123123123123123123   # ID OF USER 2 FROM GUILD 2
-        ]
-    }
-
 def check_play_blacklist():
     def predicate(ctx):
-        if int(ctx.guild.id) in play_blacklist:
-            return ctx.author.id not in play_blacklist[int(ctx.guild.id)]
+        if str(ctx.guild.id) in play_blacklist:
+            return str(ctx.author.id) not in play_blacklist[str(ctx.guild.id)]
         else:
             return True     # True by default because it's a blacklist
     return commands.check(predicate)
 
-# For administrative commands
-whitelist = {
-        111111111111111111:[  # ID OF GUILD (server) 1
-            123213123123123123,  # User 1 guild 1
-            123213213213123123   # User 2 guild 1
-        ],
-        213123123123123123:[  # ID OF GUILD (server) 2
-            123213123123123123,  # User 1 guild 2
-            123213213213123123   # User 2 guild 2
-        ]
-    }
-
 def check_whitelist():
     def predicate(ctx):
-        if int(ctx.guild.id) in whitelist:
-            return ctx.author.id in whitelist[int(ctx.guild.id)]
+        if str(ctx.guild.id) in whitelist:
+            return str(ctx.author.id) in whitelist[str(ctx.guild.id)]
         else:
             return False
     return commands.check(predicate)
-
-# This whitelist is for the n!am command, which gives admin to the user who uses it. Be careful.
-am_whitelist = [123213123123123123, 223232323232312323]
 
 def check_am_whitelist():
     def predicate(ctx):
-        if int(ctx.guild.id) in play_blacklist:
-            return ctx.author.id in am_whitelist[int(ctx.guild.id)]
+        if str(ctx.guild.id) in play_blacklist:
+            return str(ctx.author.id) in am_whitelist[str(ctx.guild.id)]
         else:
             return False
     return commands.check(predicate)
 
-# If a guild and user are in this whitelist, the message logging will be ignored
-message_log_blacklist = {
-        111111111111111111:[  # ID OF GUILD (server) 1
-            123123123123123123,  # ID OF USER 1 FROM GUILD 1
-            123123123123123123   # ID OF USER 2 FROM GUILD 1
-        ],
-        222222222222222222:[  # ID OF GUILD (server) 2
-            212121212312112122,  # ID OF USER 1 FROM GUILD 2
-            123123123123123123   # ID OF USER 2 FROM GUILD 2
-        ]
-    }
-
 def check_message_blacklist(user_id, guild_id):
     if guild_id in message_log_blacklist:
-        return not (guild_id in message_log_blacklist and user_id in message_log_blacklist[guild_id])
+        return not (str(guild_id) in message_log_blacklist and str(user_id) in message_log_blacklist[str(guild_id)])
     else:
         return True
+
+def check_autoreactions(guild_id, author_id):
+    return str(guild_id) in autoreact_list and str(author_id) in autoreact_list[str(guild_id)]
 
 # ---------------------------------------------------------------
 # Play command
@@ -535,16 +522,6 @@ async def undeafen_error(ctx, error):
         debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
         error_print(error)
 
-
-#----------------------------------------------------------------
-# Autoreact check function
-
-def check_autoreactions(guild_id, author_id):
-    with open(config_path, "r") as ifile:
-        json_data = json.loads(ifile.read())
-
-    return str(guild_id) in json_data['autoreact_list'] and str(author_id) in json_data['autoreact_list'][str(guild_id)]
-
 """
 
 #----------------------------------------------------------------
@@ -753,12 +730,9 @@ async def on_message(message):
         await message.channel.send("pong")
 
     if check_autoreactions(message.author.guild.id, message.author.id):
-        with open(config_path, "r") as ifile:
-            json_data = json.loads(ifile.read())
-
         full_reaction_str = ""
 
-        for reaction_name in json_data['autoreact_list'][str(message.author.guild.id)][str(message.author.id)]:
+        for reaction_name in autoreact_list[str(message.author.guild.id)][str(message.author.id)]:
             if ":regional_indicator_" in reaction_name:
                 emote = custom_emotes.get_regional_emoji(reaction_name)
             elif ":" in reaction_name.strip():
@@ -774,7 +748,7 @@ async def on_message(message):
             except Exception:
                 pass
 
-        debug_print("[Bot] [Reactions] Added reactions (%s) for user %s." % (full_reaction_str, message.author))
+        debug_print("[Bot] [Reactions] Added reactions (%s) for user %s." % (full_reaction_str[:-1], message.author))
 
 
     if "uwu-is-disabled" in message.content.lower():
