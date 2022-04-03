@@ -5,5 +5,7 @@
 	    	":duck:"
 	    ]
         }
+    },
+    "whitelist": {
     }
 }
