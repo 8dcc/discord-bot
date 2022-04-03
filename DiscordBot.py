@@ -106,7 +106,7 @@ def check_am_whitelist():
 # If a guild and user are in this whitelist, the message logging will be ignored
 message_log_blacklist = {
         111111111111111111:[  # ID OF GUILD (server) 1
-            123215553123123123,  # ID OF USER 1 FROM GUILD 1
+            123123213123123123,  # ID OF USER 1 FROM GUILD 1
             123123123123123123   # ID OF USER 2 FROM GUILD 1
         ],
         222222222222222222:[  # ID OF GUILD (server) 2
@@ -647,9 +647,12 @@ async def on_message(message):
     if message.author == client.user or message.content.strip() == "":
         return
 
-    if debug and check_message_blacklist(message.author.id, message.author.guild.id):
-        debug_message = "[%s/%s]-[%s]: %s" % (message.author.guild.name, message.channel, message.author, message.content)
-        debug_print(debug_message)
+    try:
+        if debug and check_message_blacklist(message.author.id, message.author.guild.id):
+            debug_message = "[%s/%s]-[%s]: %s" % (message.author.guild.name, message.channel, message.author, message.content)
+            debug_print(debug_message)
+    except Exception:
+        pass
 
     if message.content == "ping":
         await message.channel.send("pong")
