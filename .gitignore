@@ -1,4 +1,3 @@
 *.log
 /.env
-/config
 /misc
