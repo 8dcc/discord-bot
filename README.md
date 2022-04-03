@@ -92,6 +92,7 @@ screen -r DiscordBot  # Resume
 - [ ] Move whitelists to json file and read it from there instead of the code (so users can edit it easily).
 - [ ] Add `n!stats` command.
     - [ ] Show uptime?
+- [ ] Change messages (joined, playing...) to embeds.
 
 ## Related gists
 * [discord_purge.py](https://gist.github.com/r4v10l1/a21360c3f92266c0b03db7cc9b73e7ff) - Discord bot purge 1.
