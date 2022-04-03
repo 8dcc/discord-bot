@@ -39,12 +39,13 @@ This commands will only work if you are the bot owner or you are in the am white
 * `n!am` if you want to know about this one, check the code yourself :)
 
 ### Misc:
-* `ping` to make sure it works
+* `ping` or `n!ping` to make sure it works.
 * Detects if a message contains `uwu`, then screams.
 * Leaves the channel if alone for 30 seconnds.
 * Has a `n!play` blacklist in case someone listens to k-pop.
 * Has a whitelist for administration commands (Checks the whitelist instead of the role).
 * Send custom embeds to a custom channel with `console.py`.
+* Can autoreact to user's messages. See [this link](https://carpedm20.github.io/emoji/all.html?enableList=enable_list_alias) for emote names.
 
 ## Running the bot yourself
 First, you will need to edit the `.env` file, and replace there your bot token.
@@ -86,7 +87,7 @@ screen -r DiscordBot  # Resume
 - [ ] Add queue system.
 - [ ] Wanna play blackjack with the bot  **:^)**
 - [ ] Separate code into multiple files.
-- [ ] Add autorreactions for users and guilds.
+- [X] Add autorreactions for users and guilds.
     - [ ] Add autorreact command for appending to the json?
 - [ ] Move whitelists to json file and read it from there instead of the code (so users can edit it easily).
 - [ ] Add `n!stats` command.
