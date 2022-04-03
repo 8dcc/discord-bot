@@ -45,6 +45,7 @@ This commands will only work if you are the bot owner or you are in the am white
 * Has a whitelist for administration commands (Checks the whitelist instead of the role).
 * Send custom embeds to a custom channel with `console.py`.
 * Can autoreact to user's messages. See [this link](https://carpedm20.github.io/emoji/all.html?enableList=enable_list_alias) for emote names.
+	* Tries to find regional discord emojis in the custom_emojis dictionary. If it doesn't find it tries to use the emoji module with 2 different languages.
 
 ## Running the bot yourself
 First, you will need to edit the `.env` file, and replace there your bot token.
