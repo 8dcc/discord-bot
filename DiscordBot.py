@@ -1,4 +1,4 @@
-import discord, os, time, asyncio
+import discord, os, time, asyncio, json, emoji
 from discord.ext import commands
 from dotenv import load_dotenv
 import youtube_dl
@@ -16,6 +16,7 @@ client = commands.Bot(command_prefix='n!', intents=intents)
 
 discord_log_path = "discord-bot.log"
 bot_error_path = "bot-errors.log"
+config_path = "config/config.json"  # Used for some blacklists and all
 
 # ---------------------------------------------------------------
 # Functions and initial settings
@@ -37,16 +38,25 @@ def error_print(text):
         with open(bot_error_path, "a") as error_log:
             error_log.write("=======================\n" + time.strftime("%d %b %Y - %H:%M:%S") + "\n"  + str(text) + "\n=======================\n")
 
+def bak_config_file(file_path):
+    try:
+        with open(file_path, "r") as ifile:
+            output_file = file_path + ".bak"
+            with open(output_file, "w") as ofile:
+                ofile.write(ifile.read())
+    except Exception as e:
+        error_print(e)
+
 @client.event
 async def on_ready():
     print("----------------------------------------------------------------")
     print("The bot %s has connected to Discord!" % client.user)
     print("----------------------------------------------------------------")
-    if activityType == "Playing":
+    if activityType is "Playing":
         await client.change_presence(activity=discord.Game(name="with your stepmom"))
-    elif activityType == "Watching":
+    elif activityType is "Watching":
         await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="n!help"))
-    elif activityType == "Listening":
+    elif activityType is "Listening":
         await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="n!help"))
     else:
         exit("activityType error. Exiting...")
@@ -106,7 +116,7 @@ def check_am_whitelist():
 # If a guild and user are in this whitelist, the message logging will be ignored
 message_log_blacklist = {
         111111111111111111:[  # ID OF GUILD (server) 1
-            123123213123123123,  # ID OF USER 1 FROM GUILD 1
+            123123123123123123,  # ID OF USER 1 FROM GUILD 1
             123123123123123123   # ID OF USER 2 FROM GUILD 1
         ],
         222222222222222222:[  # ID OF GUILD (server) 2
@@ -360,7 +370,7 @@ async def stop(ctx):
 
 
 # ---------------------------------------------------------------
-# Kick and band command
+# Kick and ban command
 
 @client.command()
 @commands.check_any(commands.is_owner(), check_whitelist())
@@ -524,6 +534,82 @@ async def undeafen_error(ctx, error):
         debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
         error_print(error)
 
+
+#----------------------------------------------------------------
+# Autoreact check function
+
+def check_autoreactions(guild_id, author_id):
+    with open(config_path, "r") as ifile:
+        json_data = json.loads(ifile.read())
+
+    return str(guild_id) in json_data['autoreact_list'] and str(author_id) in json_data['autoreact_list'][str(guild_id)]
+
+"""
+
+#----------------------------------------------------------------
+# Autoreact command
+
+@client.command(aliases=["ar"])
+@commands.check_any(commands.is_owner(), check_whitelist())
+async def autoreact(ctx, member : discord.Member, *, reaction):
+    
+    print(type(reaction))
+    reaction = f'\\u{ord(str(reaction)):08x}'
+
+    if False and "\\u" not in reaction:
+        await ctx.send(':warning: **Invalid arguments. Make sure yousend the actual emoji, not the string (`:duck:`, not `duck`).\nUsage:**  `n!autoreact <username> <emote>`')
+        debug_print('[Bot] Could not parse arguments (Invalid emoji %s) for user: %s' % (reaction, ctx.author))
+        return
+
+    bak_config_file(config_path)
+    with open(config_path, "r") as ifile:
+        json_data = json.loads(ifile.read())
+    
+    if ctx.guild.id in json_data['autoreact_list']:
+        if member.id in json_data['autoreact_list'][ctx.guild.id]:
+            if str(reaction) not in json_data['autoreact_list'][str(ctx.guild.id)][str(member.id)]:
+                # append reaction
+                json_data['autoreact_list'][str(ctx.guild.id)][str(member.id)].append(reaction)
+                debug_print('[Bot] User %s added autoreaction (%s) for user %s.' % (ctx.author, reaction, member.display_name))
+            else:
+                debug_print('[Bot] User %s tried to add autoreactions for user %s but it was in the json.' % (ctx.author, member.display_name))
+        else:
+            # append user and reaction
+            json_data['autoreact_list'][str(ctx.guild.id)].update({str(member.id): []})
+            json_data['autoreact_list'][str(ctx.guild.id)][str(member.id)].append(reaction)
+            debug_print('[Bot] User %s added autoreaction (%s) for user %s.' % (ctx.author, reaction, member.display_name))
+    else:
+        # add guild, user and reaction
+        json_data['autoreact_list'].update({str(ctx.guild.id): {}})
+        json_data['autoreact_list'][str(ctx.guild.id)].update({str(member.id): []})
+        json_data['autoreact_list'][str(ctx.guild.id)][str(member.id)].append(reaction)
+        debug_print('[Bot] User %s added autoreaction (%s) for user %s.' % (ctx.author, reaction, member.display_name))
+
+    with open(config_path, "w") as ofile:
+        ofile.write(json.dumps(json_data, indent=4))
+
+
+    embed = discord.Embed(title="Done", description="**%s** added autoreactions to **%s**" % (ctx.author.display_name, member.display_name), color=0x11ff11)
+    await ctx.send(embed=embed)
+
+@autoreact.error
+async def autoreact_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send(':warning: **Missing required arguments. Usage:**  `n!autoreact <username> <emote_str>`')
+        debug_print('[Bot] Could not parse arguments (Not enough arguments) for user: %s' % ctx.author)
+    elif isinstance(error, commands.MemberNotFound):
+        await ctx.send(':warning: **Member not found. Make sure you don\'t use nicknames.**')
+        debug_print('[Bot] Could not parse arguments (No member) for user: %s' % ctx.author)
+    elif isinstance(error, commands.CheckFailure):
+        await ctx.send(':warning: **You don\'t have the permissions to do that, %s.**' % ctx.author.mention)
+        debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
+    else:
+        await ctx.send(':warning: **Unknown error. Contact the bot owner.**')
+        debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
+        error_print(error)
+
+"""
+
 #----------------------------------------------------------------
 # Purge commands
 
@@ -640,6 +726,14 @@ async def selfadmin_error(ctx, error):
         error_print(error)
 
 # ---------------------------------------------------------------
+# Ping command (n!ping, not ping itself)
+
+@client.command()
+async def ping(ctx):
+    await ctx.message.add_reaction("\U0001f44b")
+    debug_print('[Bot] User %s requested ping command.' % ctx.author)
+
+# ---------------------------------------------------------------
 # Message events
 
 @client.event
@@ -647,17 +741,31 @@ async def on_message(message):
     if message.author == client.user or message.content.strip() == "":
         return
 
-    try:
-        if debug and check_message_blacklist(message.author.id, message.author.guild.id):
+    if debug and check_message_blacklist(message.author.id, message.author.guild.id):
+        try:
             debug_message = "[%s/%s]-[%s]: %s" % (message.author.guild.name, message.channel, message.author, message.content)
             debug_print(debug_message)
-    except Exception:
-        pass
+        except Exception:
+            pass
 
     if message.content == "ping":
         await message.channel.send("pong")
 
-    if "uwu" in message.content.lower():
+    if check_autoreactions(message.author.guild.id, message.author.id):
+        with open(config_path, "r") as ifile:
+            json_data = json.loads(ifile.read())
+
+        for reaction_name in json_data['autoreact_list'][str(message.author.guild.id)][str(message.author.id)]:
+            emote = emoji.emojize(str(reaction_name), language='alias')
+            
+            try:
+                await message.add_reaction(emote)
+            except Exception:
+                pass
+
+            debug_print("[Bot] [Reactions] Added reaction (%s) for user %s." % (reaction_name, message.author.display_name))
+
+    if "uwu-is-disabled" in message.content.lower():
         if debug:
             debug_print("[Bot] uwu detected...")
         embed = discord.Embed(title="Tourette", description="**AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA**\n Can't say that here.", color=0xff1111)
