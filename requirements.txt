@@ -2,4 +2,4 @@ discord
 python-dotenv
 youtube-dl
 PyNaCl
-ffmpeg-python
+emoji
