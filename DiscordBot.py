@@ -1,4 +1,5 @@
 import discord, os, time, asyncio, json, emoji
+import lib.custom_emotes as custom_emotes
 from discord.ext import commands
 from dotenv import load_dotenv
 import youtube_dl
@@ -14,8 +15,8 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 intents = discord.Intents().all()
 client = commands.Bot(command_prefix='n!', intents=intents)
 
-discord_log_path = "discord-bot.log"
-bot_error_path = "bot-errors.log"
+discord_log_path = "logs/discord-bot.log"
+bot_error_path = "logs/bot-errors.log"
 config_path = "config/config.json"  # Used for some blacklists and all
 
 # ---------------------------------------------------------------
@@ -755,15 +756,26 @@ async def on_message(message):
         with open(config_path, "r") as ifile:
             json_data = json.loads(ifile.read())
 
+        full_reaction_str = ""
+
         for reaction_name in json_data['autoreact_list'][str(message.author.guild.id)][str(message.author.id)]:
-            emote = emoji.emojize(str(reaction_name), language='alias')
-            
+            if ":regional_indicator_" in reaction_name:
+                emote = custom_emotes.get_regional_emoji(reaction_name)
+            elif ":" in reaction_name.strip():
+                emote = emoji.emojize(str(reaction_name), language='alias')
+                if emote == reaction_name.strip():
+                    emote = emoji.emojize(str(reaction_name), language='en')
+            else:
+                emote = reaction_name
+
             try:
                 await message.add_reaction(emote)
+                full_reaction_str += reaction_name + ","
             except Exception:
                 pass
 
-            debug_print("[Bot] [Reactions] Added reaction (%s) for user %s." % (reaction_name, message.author.display_name))
+        debug_print("[Bot] [Reactions] Added reactions (%s) for user %s." % (full_reaction_str, message.author))
+
 
     if "uwu-is-disabled" in message.content.lower():
         if debug:
@@ -772,7 +784,7 @@ async def on_message(message):
         await message.channel.send(embed=embed)
         channel = client.get_channel(12312312312312313123)
         if channel != None:
-            await channel.send("[Alert] User %s said something bad." % message.author.display_name)
+            await channel.send("[Alert] User %s said something bad." % message.author)
 
     await client.process_commands(message)
 
