@@ -89,7 +89,7 @@ screen -r DiscordBot  # Resume
 - [ ] Separate code into multiple files.
 - [X] Add autorreactions for users and guilds.
     - [ ] Add autorreact command for appending to the json?
-- [ ] Move whitelists to json file and read it from there instead of the code (so users can edit it easily).
+- [X] Move whitelists to json file and read it from there instead of the code (so users can edit it easily).
 - [ ] Add `n!stats` command.
     - [ ] Show uptime?
 - [ ] Change messages (joined, playing...) to embeds.
