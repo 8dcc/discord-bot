@@ -1,12 +1,11 @@
-# Discord bot
-
-<p>
+<div>
+  <h1 align="center">Discord bot</h1>
   <b>My discord bot made in python.</b>
-  
   <a target="_blank" href="https://github.com/r4v10l1/discord-bot">
     <img align="right" height="75em" src="Images/Discord.png" alt="Discord logo" />
   </a>
-</p>
+  <br><br>
+</div>
 
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
