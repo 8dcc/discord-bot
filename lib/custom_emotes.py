@@ -1,0 +1,31 @@
+def get_regional_emoji(regional_id):
+    regional_emojis = {
+            ":regional_indicator_a:": "\U0001f1e6",
+            ":regional_indicator_b:": "\U0001f1e7",
+            ":regional_indicator_c:": "\U0001f1e8",
+            ":regional_indicator_d:": "\U0001f1e9",
+            ":regional_indicator_e:": "\U0001f1ea",
+            ":regional_indicator_f:": "\U0001f1eb",
+            ":regional_indicator_g:": "\U0001f1ec",
+            ":regional_indicator_h:": "\U0001f1ed",
+            ":regional_indicator_i:": "\U0001f1ee",
+            ":regional_indicator_j:": "\U0001f1ef",
+            ":regional_indicator_k:": "\U0001f1f0",
+            ":regional_indicator_l:": "\U0001f1f1",
+            ":regional_indicator_m:": "\U0001f1f2",
+            ":regional_indicator_n:": "\U0001f1f3",
+            ":regional_indicator_o:": "\U0001f1f4",
+            ":regional_indicator_p:": "\U0001f1f5",
+            ":regional_indicator_q:": "\U0001f1f6",
+            ":regional_indicator_r:": "\U0001f1f7",
+            ":regional_indicator_s:": "\U0001f1f8",
+            ":regional_indicator_t:": "\U0001f1f9",
+            ":regional_indicator_u:": "\U0001f1fa",
+            ":regional_indicator_v:": "\U0001f1fb",
+            ":regional_indicator_w:": "\U0001f1fc",
+            ":regional_indicator_x:": "\U0001f1fd",
+            ":regional_indicator_y:": "\U0001f1fe",
+            ":regional_indicator_z:": "\U0001f1ff",
+            }
+
+    return regional_emojis[regional_id]
