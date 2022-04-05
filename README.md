@@ -96,7 +96,7 @@ screen -r DiscordBot  # Resume
 - [X] Make the bot "stream" the songs instead of downloading them.
 - [ ] Add queue system.
 - [ ] Wanna play blackjack with the bot  **:^)**
-- [ ] Separate code into multiple files.
+- [X] Separate code into multiple files.
 - [X] Add autorreactions for users and guilds.
     - [ ] Add autorreact command for appending to the json?
 - [X] Move whitelists to json file and read it from there instead of the code (so users can edit it easily).
