@@ -1,7 +1,7 @@
 {
 	"channel_id": "123123123123123123123",
 	"embed_title": "Embed test!",
-	"embed_url": "htts://test.com",
+	"embed_url": "https://test.com",
 	"embed_color": "00ff00",
 	"embed_thumbnail": "https://test.com/image.png",
 	"embed_description": "This is a test.\nThis a new line bruuh."
