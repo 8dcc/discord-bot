@@ -54,22 +54,22 @@ This commands will only work if you are the bot owner or you are in the am white
 
 ## Running the bot yourself
 First, you will need to edit the `.env` file, and replace there your bot token.
-```console
+```bash
 # .env
 DISCORD_TOKEN={YOUR_TOKEN_HERE}
 ```
 You will also need to edit the configuration file (`settings.py`).
-```console
+```bash
 vim settings.py
 ```
 You can then run the bot with docker:
-```console
+```bash
 # I am kinda new to docker so if you think it can be done better let me know
 docker build -t discord-bot .
 docker run --rm -d -it --name discord-bot discord-bot
 ```
 Or run it normally:
-```console
+```bash
 # You will need to install some depencencies
 python3 -m pip install -r requirements.txt
 
@@ -78,7 +78,7 @@ chmod +x start-bot.sh
 ./start-bot.sh
 ```
 After running the bot, a screen session named `DiscordBot`.
-```console
+```bash
 screen -ls            # To list the sessions
 screen -r DiscordBot  # Resume
 # Ctrl+D + Ctrl+A to detach the session again
