@@ -45,22 +45,31 @@ This commands will only work if you are the bot owner or you are in the am white
 * Has a whitelist for administration commands (Checks the whitelist instead of the role).
 * Send custom embeds to a custom channel with `console.py`.
 * Can autoreact to user's messages. See [this link](https://carpedm20.github.io/emoji/all.html?enableList=enable_list_alias) for emote names.
-	* Tries to find regional discord emojis in the custom_emojis dictionary. If it doesn't find it tries to use the emoji module with 2 different languages.
+	* Tries to find regional discord emojis in the `custom_emojis` dictionary. If it doesn't find it tries to use the emoji module with 2 different languages.
+* Logs with a new system:
+	* `[W]` for warnings.
+	* `[E]` for errors (`discord_log_path`)
+	* `[ET]` for error timestamps (Wrote to `discord_log_path`, reference a date in `bot_error_path`)
+	* `[Module]` It also has a small tag about the module used (`Music`, `Administration`, ...)
 
 ## Running the bot yourself
 First, you will need to edit the `.env` file, and replace there your bot token.
-```bash
+```console
 # .env
 DISCORD_TOKEN={YOUR_TOKEN_HERE}
 ```
+You will also need to edit the configuration file (`settings.py`).
+```console
+vim settings.py
+```
 You can then run the bot with docker:
-```bash
+```console
 # I am kinda new to docker so if you think it can be done better let me know
 docker build -t discord-bot .
 docker run --rm -d -it --name discord-bot discord-bot
 ```
 Or run it normally:
-```bash
+```console
 # You will need to install some depencencies
 python3 -m pip install -r requirements.txt
 
@@ -69,7 +78,7 @@ chmod +x start-bot.sh
 ./start-bot.sh
 ```
 After running the bot, a screen session named `DiscordBot`.
-```bash
+```console
 screen -ls            # To list the sessions
 screen -r DiscordBot  # Resume
 # Ctrl+D + Ctrl+A to detach the session again
@@ -93,6 +102,7 @@ screen -r DiscordBot  # Resume
 - [ ] Add `n!stats` command.
     - [ ] Show uptime?
 - [ ] Change messages (joined, playing...) to embeds.
+- [ ] Add tags to `debug_print()`
 
 ## Related gists
 * [discord_purge.py](https://gist.github.com/r4v10l1/a21360c3f92266c0b03db7cc9b73e7ff) - Discord bot purge 1.
