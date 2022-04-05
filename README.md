@@ -58,9 +58,10 @@ First, you will need to edit the `.env` file, and replace there your bot token.
 # .env
 DISCORD_TOKEN={YOUR_TOKEN_HERE}
 ```
-You will also need to edit the configuration file (`settings.py`).
+You will also need to edit the configuration file (`settings.py`) and the whitelists file (`config/config.json`).
 ```bash
 vim settings.py
+vim config/config.json
 ```
 You can then run the bot with docker:
 ```bash
