@@ -45,9 +45,9 @@ async def help():
 # ---------------------------------------------------------------
 
 async def custom_embed(channel_id, title, url, color, thumbnail, description):
-    color = discord.Color(value=int(color, 16))
+    dcolor = discord.Color(value=int(color, 16))
 
-    embed = discord.Embed(title=title, url=url, description=description, color=color)
+    embed = discord.Embed(title=title, url=url, description=description, color=dcolor)
     embed.set_thumbnail(url=thumbnail)
 
     channel = client.get_channel(int(channel_id))
@@ -72,7 +72,8 @@ async def on_ready():
         channel_id = json_data['channel_id']
         embed_title = json_data['embed_title']
         embed_url = json_data['embed_url']
-        embed_color = json_data['embed_color']
+        #embed_color = json_data['embed_color']
+        embed_color = "36393F"
         embed_thumbnail = json_data['embed_thumbnail']
         embed_description = json_data['embed_description']
 
