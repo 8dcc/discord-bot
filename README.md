@@ -10,6 +10,17 @@
 [![Forks][forks-shield]][forks-url]
 [![Stargazers][stars-shield]][stars-url]
 
+## Table of contents
+* [Features](#features)
+	* [Music](#music)
+	* [Administration](#music)
+	* [Misc](#music)
+* [Running the bot yourself](#running-the-bot-yourself)
+* [Structure of the bot](#structure-of-the-bot)
+* [Possible errors](#possible-errors)
+* [Todo](#todo)
+* [Related gists](#related-gists)
+
 ## Features
 
 ### Music:
@@ -84,6 +95,25 @@ screen -ls            # To list the sessions
 screen -r DiscordBot  # Resume
 # Ctrl+D + Ctrl+A to detach the session again
 ```
+
+## Structure of the bot
+The bot uses [`cogs`](https://discordpy.readthedocs.io/en/stable/ext/commands/cogs.html) to organize the functions (commands) into different files.  
+The structure of the bot is the following:  
+
+<img width="250px" src="images/bot-structure.png" alt="Structure of the bot">
+
+* `DiscordBot.py` is the main file. It will create the bot and manage all the cogs.
+* In the `config` folder you can edit the `config.json` file. This file contains all the whitelists and blacklists for the bot.  
+	You can check its [`readme.md`](https://github.com/r4v10l1/discord-bot/tree/main/config).
+* The `logs` folder is the folder that the commands will write when events happen.
+* The `modules` folder contains all the python files needed for the bot to work.
+	* In the `cogs` folder you can find a file for each cog, divided by categories. These are the commands itself.
+	* In the `functions` folder you can find files for functions or classes that the bot needs, for example `debug_print()` or `error_print()`, that show the events that the bot recieves.  
+		The file `botclass.py` contains the class of the bot itself.
+	* In the `variables` folder you can find files that contain variables or data that the bot needs. For example `custom_emotes.py` contains all the regional emotes in unicode format needed for reactions.
+
+Thanks to the [discord.py](https://discord.com/invite/r3sSKJJ) community for being so kind and helping me out. :)
+
 
 ## Possible errors
 * The bot can't download age-restricted content.
