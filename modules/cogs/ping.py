@@ -14,7 +14,7 @@ class PingCog(commands.Cog):
         await ctx.message.add_reaction("\U0001f44b")
         debug_print('[Bot] User %s requested ping command.' % ctx.author)
 
-    @client.command()
+    @commands.command()
     async def memes(self, ctx):
         embed = discord.Embed(color=0xff1111)
         embed.set_thumbnail(url="https://u.teknik.io/UjPuB.png")
