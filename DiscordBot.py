@@ -61,25 +61,32 @@ client.add_cog(PingCog(client))
 # ---------------------------------------------------------------
 # Help command
 
-@client.remove_command("help")      # Can't get this to work in a cog, feel free to improve it
+# Can't get this (remove_command) to work in a cog, feel free to improve it
+# Also, when you ctrl+c out of the bot it throws an exception because of this help
+@client.remove_command("help")
 @client.command()
 async def help(ctx):
 
     help_text1 = "`n!play <url>` - Play audio in a voice channel (.mp3 url, youtube url or youtube search). \n`n!join` - Join the user's channel.\n`n!join_channel <channel_name>` - Join the specified channel.\n`n!leave` - Leaves the current channel.\n`n!pause` - Pauses the audio.\n`n!resume` - Resumes the audio.\n`n!stop` - Stops the audio without leaving the channel."
     help_text2 = "*This commands will only work if you are the bot owner or if you are in the whitelist.*\n`n!kick @someone` to kick a user.\n`n!ban @someone` to ban a user.\n`n!mute @someone` to mute a user. Also `n!m`.\n`n!unmute @someone` to unmute a user. Also `n!um`.\n`n!deafen @someone` to deafen a user. Also `n!d`.\n`n!undeafen @someone` to undeafen a user. Also `n!ud`.\n`n!purge @someone <messages_to_check>` will check X messages, and will delete them if the author is the specified user. Also `n!clean`.\n`n!spam <amount> <message>` will spam the specified messae in the current channel the amount of times."
 
-    embed = discord.Embed(title="Help", url="https://github.com/r4v10l1/discord-bot/blob/main/README.md", color=0x1111ff)
-    embed.set_thumbnail(url="https://u.teknik.io/m3lTR.png")  # uazs5
-    embed.add_field(name="Music", value=help_text1, inline=False)
+    embed = discord.Embed(title="Help", 
+            url="https://github.com/r4v10l1/discord-bot/blob/main/README.md", 
+            color=0x1111ff)
+    embed.set_thumbnail(url="https://u.teknik.io/m3lTR.png")
+    embed.add_field(name="Music", 
+            value=help_text1, 
+            inline=False)
 
     author_is_owner = await client.is_owner(ctx.author)
 
     if (author_is_owner == True) or ( (int(ctx.guild.id) in client.whitelist) and (int(ctx.author.id) in client.whitelist[int(ctx.guild.id)]) ):
-        embed.add_field(name="Administration", value=help_text2, inline=False)
+        embed.add_field(name="Administration",
+                value=help_text2,
+                inline=False)
 
     await ctx.send(embed=embed)
-    debug_print('[Bot] User %s requested help' % ctx.author)
-
+    debug_print('[Bot] [Help] User %s requested help' % ctx.author)
 
 # ---------------------------------------------------------------
 # Message events
@@ -122,7 +129,6 @@ async def on_message(message):
         if len(reaction_array) > 0:
             debug_print("[Bot] [Reactions] Added reactions (%s) for user %s." % (full_reaction_str[:-1], message.author))
 
-
     if "uwu-is-disabled" in message.content.lower():
         if debug:
             debug_print("[Bot] [Message detection] uwu detected...")
@@ -138,6 +144,6 @@ async def on_message(message):
 # Starting the bot
 
 try:
-    client.run(TOKEN[1:-1])  # Start bot with the token from .env
+    client.run(TOKEN[1:-1])     # Start bot with the token from .env
 except KeyboardInterrupt:
     exit("\nDetected Ctrl+C. Exiting...\n")
