@@ -133,7 +133,7 @@ Thanks to the [discord.py](https://discord.com/invite/r3sSKJJ) community for bei
 - [ ] Add `n!stats` command.
     - [ ] Show uptime?
 - [ ] Change messages (joined, playing...) to embeds.
-- [ ] Add tags to `debug_print()`
+- [X] Add tags to `debug_print()`
 
 ## Related gists
 * [discord_purge.py](https://gist.github.com/r4v10l1/a21360c3f92266c0b03db7cc9b73e7ff) - Discord bot purge 1.
