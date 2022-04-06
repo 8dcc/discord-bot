@@ -51,20 +51,20 @@ class MusicCog(commands.Cog):
                 return
 
             ydl_opts = {
-                'format': 'bestaudio/best',
-                'noplaylist': 'true',
-                'max_filesize': 90000000,
-                'postprocessors': [{
-                    'key': 'FFmpegExtractAudio',
-                    'preferredcodec': 'mp3',
-                    'preferredquality': '192',
-                }],
-            }
+                    'format': 'bestaudio/best',
+                    'noplaylist': 'true',
+                    'max_filesize': 90000000,
+                    'postprocessors': [{
+                        'key': 'FFmpegExtractAudio',
+                        'preferredcodec': 'mp3',
+                        'preferredquality': '192',
+                        }],
+                    }
 
             ffmpeg_options = {
-                'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
-                'options': '-vn'
-            }
+                    'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
+                    'options': '-vn'
+                    }
 
             if "youtube.com" in url or ".mp3" in url:
                 with youtube_dl.YoutubeDL(ydl_opts) as ydl:
@@ -74,11 +74,11 @@ class MusicCog(commands.Cog):
             else:
                 with youtube_dl.YoutubeDL(ydl_opts) as ydl:
                     try:
-                       get(url)
+                        get(url)
                     except:
-                       info_dict = ydl.extract_info("ytsearch:%s" % url, download=False)['entries'][0]
+                        info_dict = ydl.extract_info("ytsearch:%s" % url, download=False)['entries'][0]
                     else:
-                       info_dict = ydl.extract_info(url, download=False)
+                        info_dict = ydl.extract_info(url, download=False)
 
                 await ctx.send(":musical_note:  **Playing `%s`**" % info_dict['title'])
                 debug_print("[Bot] [Music] %s requested play search for \'%s\' (%s)." % (str(ctx.author), url, info_dict['webpage_url']))
@@ -88,7 +88,9 @@ class MusicCog(commands.Cog):
                 voice.is_playing()
             except Exception as e:
                 #await ctx.send(":warning: **There was an error playing that song...**")
-                embed = discord.Embed(title="Error", description="**There was an error playing that song.**\nSee possibe errors [here](https://github.com/r4v10l1/discord-bot#possible-errors).", color=0xff1111)
+                embed = discord.Embed(title="Error", 
+                        description="**There was an error playing that song.**\nSee possibe errors [here](https://github.com/r4v10l1/discord-bot#possible-errors).", 
+                        color=0xff1111)
                 await ctx.send(embed=embed)
                 error_print(e)
 
@@ -102,14 +104,17 @@ class MusicCog(commands.Cog):
             await ctx.send(':warning: **You are in the blacklist, %s.**' % ctx.author.mention)
             debug_print('[Bot] [E] [Music] User %s requested join_channel command, but was in the blacklist.' % ctx.author)
         else:
-            embed = discord.Embed(title="Error", description="**There was an error playing that song.**\nSee possibe errors [here](https://github.com/r4v10l1/discord-bot#possible-errors).", color=0xff1111)
+            embed = discord.Embed(title="Error", 
+                    description="**There was an error playing that song.**\nSee possibe errors [here](https://github.com/r4v10l1/discord-bot#possible-errors).", 
+                    color=0xff1111)
             await ctx.send(embed=embed)
             error_print(error)
 
     #----------------------------------------------------------------
-    # Join, join_channel, leave, pause, resume and stop commands
+    # Join command
 
     @commands.command()
+    @commands.check_any(commands.is_owner(), check_play_blacklist())
     async def join(self, ctx):  # Join the same channel as the user
         if ctx.author.voice is None:
             await ctx.send(":warning:  **I can't find your channel,** %s" % ctx.author.mention)
@@ -141,7 +146,16 @@ class MusicCog(commands.Cog):
 
         ctx.bot.loop.create_task(check_alone())
 
+    @join.error
+    async def join_error(self, ctx, error):
+        if isinstance(error, commands.CheckFailure):
+            await ctx.send(':warning: **You are in the blacklist, %s.**' % ctx.author.mention)
+            debug_print('[Bot] [W] [Music] User %s requested join command, but he is in the blacklist.' % ctx.author)
+        else:
+            error_print(error)
+
     #----------------------------------------------------------------
+    # Join_channel command
 
     @commands.command()
     @commands.check_any(commands.is_owner(), check_play_blacklist())
@@ -151,10 +165,10 @@ class MusicCog(commands.Cog):
         if voice == None:
             await voiceChannel.connect()
             await ctx.send(":ballot_box_with_check:  **Joined channel `%s`**" % str(voiceChannel))
-            debug_print('[Bot] %s requested join command. Joined channel %s.' % (str(ctx.author), str(voiceChannel)))
+            debug_print('[Bot] [Music] %s requested join command. Joined channel %s.' % (str(ctx.author), str(voiceChannel)))
         else:
             await ctx.send(":warning:  **I am in that channel you fucking piece of shit.** %s" % ctx.author.mention)
-            debug_print('[Bot] %s Requested a song, but I am already in that channel.' % ctx.author)
+            debug_print('[Bot] [W] [Music] %s Requested a song, but I am already in that channel.' % ctx.author)
             return
 
         async def check_alone():
@@ -166,19 +180,21 @@ class MusicCog(commands.Cog):
                 elif len(voice.channel.members) == 1:
                     await voice.disconnect()
                     await ctx.send(":information_source:  **Left the channel because of inactivity.**")
-                    debug_print("[Bot] Disconnected from channel '%s/%s' because of inactivity." % (str(ctx.guild), str(voice.channel)))
+                    debug_print("[Bot] [Music] Disconnected from channel '%s/%s' because of inactivity." % (str(ctx.guild), str(voice.channel)))
                     break
 
         ctx.bot.loop.create_task(check_alone())
-
 
     @join_channel.error
     async def join_channel_error(self, ctx, error):
         if isinstance(error, commands.CheckFailure):
             await ctx.send(':warning: **You are in the blacklist, %s.**' % ctx.author.mention)
-            debug_print('[Bot] User %s requested join_channel command, but he is in the blacklist.' % ctx.author)
+            debug_print('[Bot] [W] [Music] User %s requested join_channel command, but he is in the blacklist.' % ctx.author)
         else:
             error_print(error)
+
+    #----------------------------------------------------------------
+    # Leave command
 
     @commands.command()
     async def leave(self, ctx):
@@ -186,16 +202,19 @@ class MusicCog(commands.Cog):
             voiceChannel = ctx.voice_client.channel
         except Exception as e:
             error_print(e)
+
         voice = discord.utils.get(ctx.bot.voice_clients, guild=ctx.guild)
         if voice != None:
             await ctx.send(":call_me:  **Leaving channel `%s`**" % str(voiceChannel))
-            debug_print('[Bot] %s requested leave command. Leaving channel %s.' % (str(ctx.author), str(voiceChannel)))
+            debug_print('[Bot] [Music] %s requested leave command. Leaving channel %s.' % (str(ctx.author), str(voiceChannel)))
             await voice.disconnect()
         else:
             await ctx.send(":no_entry_sign:  **I am not in any channel.** %s" % ctx.author.mention)
-            debug_print('[Bot] %s Requested leave, but I am not in a channel.' % ctx.author)
+            debug_print('[Bot] [W] [Music] %s Requested leave, but I am not in a channel.' % ctx.author)
             return
 
+    #----------------------------------------------------------------
+    # Pause command
 
     @commands.command()
     async def pause(self, ctx):
@@ -203,16 +222,18 @@ class MusicCog(commands.Cog):
         voice = discord.utils.get(ctx.bot.voice_clients, guild=ctx.guild)
         if voice != None and voice.is_playing():
             await ctx.send(":pause_button:  **Pausing audio**")
-            debug_print('[Bot] %s requested pause command. Pausing audio...' % str(ctx.author))
+            debug_print('[Bot] [Music] %s requested pause command. Pausing audio...' % str(ctx.author))
             try:
                 await voice.pause()
             except:
                 pass
         else:
             await ctx.send(":no_entry_sign:  **I am not playing any audio.** %s" % ctx.author.mention)
-            debug_print('[Bot] %s Requested pause, but I am not playing any audio.' % ctx.author)
+            debug_print('[Bot] [W] [Music] %s Requested pause, but I am not playing any audio.' % ctx.author)
             return
 
+    #----------------------------------------------------------------
+    # Resume command
 
     @commands.command()
     async def resume(self, ctx):
@@ -220,15 +241,18 @@ class MusicCog(commands.Cog):
         voice = discord.utils.get(ctx.bot.voice_clients, guild=ctx.guild)
         if voice != None and voice.is_paused():
             await ctx.send(":arrow_forward:  **Resuming audio**")
-            debug_print('[Bot] %s requested resume command. Resuming audio...' % str(ctx.author))
+            debug_print('[Bot] [Music] %s requested resume command. Resuming audio...' % str(ctx.author))
             try:
                 await voice.resume()
             except:
                 pass
         else:
             await ctx.send(":no_entry_sign:  **The audio is not paused.** %s" % ctx.author.mention)
-            debug_print('[Bot] %s Requested resume, but the audio is not paused.' % ctx.author)
+            debug_print('[Bot] [W] [Music] %s Requested resume, but the audio is not paused.' % ctx.author)
             return
+
+    #----------------------------------------------------------------
+    # Stop command
 
     @commands.command()
     async def stop(self, ctx):
@@ -236,13 +260,13 @@ class MusicCog(commands.Cog):
         voice = discord.utils.get(ctx.bot.voice_clients, guild=ctx.guild)
         if not voice.is_paused() and voice != None:
             await ctx.send(":no_entry:  **Stoping audio**")
-            debug_print('[Bot] %s requested stop command. Stoping audio...' % str(ctx.author))
+            debug_print('[Bot] [Music] %s requested stop command. Stoping audio...' % str(ctx.author))
             try:
                 await voice.stop()
             except:
                 pass
         else:
             await ctx.send(":no_entry_sign:  **The audio is not playing.** %s" % ctx.author.mention)
-            debug_print('[Bot] %s Requested stop, but the audio is not playing.' % ctx.author)
+            debug_print('[Bot] [W] [Music] %s Requested stop, but the audio is not playing.' % ctx.author)
             return
 
