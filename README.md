@@ -124,16 +124,17 @@ Thanks to the [discord.py](https://discord.com/invite/r3sSKJJ) community for bei
 - [X] Bot needs to be on a channel to play music, if you use `n!play <song>` the bot will join, but you will need to type the command again for it to work. You can use `n!join` to make the bot join the channel before using `n!play`.
 - [X] Add a `n!help` command.
 - [X] Make the bot "stream" the songs instead of downloading them.
-- [ ] Add queue system.
-- [ ] Wanna play blackjack with the bot  **:^)**
-- [X] Separate code into multiple files.
 - [X] Add autorreactions for users and guilds.
     - [ ] Add autorreact command for appending to the json?
 - [X] Move whitelists to json file and read it from there instead of the code (so users can edit it easily).
+- [X] Separate code into multiple files.
+- [X] Add tags to `debug_print()`
+- [ ] Wanna play blackjack with the bot  **:^)**
+- [ ] Add queue system.
+- [ ] Change messages (joined, playing...) to embeds.
 - [ ] Add `n!stats` command.
     - [ ] Show uptime?
-- [ ] Change messages (joined, playing...) to embeds.
-- [X] Add tags to `debug_print()`
+- [ ] Add `n!version` for checking the commit hash with [git](https://stackoverflow.com/a/41210204/).
 
 ## Related gists
 * [discord_purge.py](https://gist.github.com/r4v10l1/a21360c3f92266c0b03db7cc9b73e7ff) - Discord bot purge 1.
