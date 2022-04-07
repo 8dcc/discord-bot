@@ -48,7 +48,11 @@ def check_defaults():
         print("I can't find config/config.json")
         print("If this is your first time running the program, you can use the default one as a template.")
         if os.path.isfile("config/config.json.default"):        # Only ask to clone if there is a file to clone
-            clone_input = input("Do you want me to copy the template to the config.json file? (Yes/No): ")
+            try:
+                clone_input = input("Do you want me to copy the template to the config.json file? (Yes/No): ")
+            except KeyboardInterrupt:
+                print("\nNot copying...")
+                exit(1)
             if "y" in clone_input.lower():
                 with open("config/config.json.default", "r") as default_file:
                     with open("config/config.json", "w") as config_file:
@@ -67,7 +71,11 @@ def check_defaults():
         print("I can't find .env")
         print("If this is your first time running the program, you can use the default one as a template.")
         if os.path.isfile(".env_default"):
-            clone_input = input("Do you want me to copy the template to the .env file? (Yes/No): ")
+            try:
+                clone_input = input("Do you want me to copy the template to the .env file? (Yes/No): ")
+            except KeyboardInterrupt:
+                print("\nNot copying...")
+                exit(1)
             if "y" in clone_input.lower():
                 with open(".env_default", "r") as default_file:
                     with open(".env", "w") as config_file:
@@ -81,7 +89,8 @@ def check_defaults():
             print("Exiting...")
             exit(1)
 
-
+# ---------------------------------------------------------------
+# Check default token from .env
 
 def get_env_token():
     load_dotenv()
