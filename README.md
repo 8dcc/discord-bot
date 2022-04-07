@@ -24,7 +24,7 @@
 ## Features
 
 ### Music:
-* `n!help` - shows a help similar to this readme.
+* `n!help` - Shows a help similar to this readme.
 * `n!play <url>` - Play audio in a voice channel (.mp3 url, youtube url or youtube search).
 * `n!join` - Join the user's channel.
 * `n!join_channel <channel_name>` - Join the specified channel.
@@ -32,6 +32,11 @@
 * `n!pause` - Pauses the audio.
 * `n!resume` - Resumes the audio.
 * `n!stop` - Stops the audio without leaving the channel.
+
+### Messages
+* `n!ping` - The bot reacts to your message to make sure it is online.
+* `n!memes` - Le funny.
+* `n!version` - Compares the current version (Whale emoji) with the remote version (Check or cross emoji depending if they match). Also `n!ver`.
 
 ### Administration:
 This commands will only work if you are the bot owner or if you are in the whitelist.
