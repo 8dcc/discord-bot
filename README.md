@@ -64,12 +64,12 @@ This commands will only work if you are the bot owner or you are in the am white
 	* `[Module]` It also has a small tag about the module used (`Music`, `Administration`, ...)
 
 ## Running the bot yourself
-First, you will need to edit the `.env` file, and replace there your bot token.
+First, you will need to edit the `.env_default` file (move it to `.env`), and replace there your bot token.
 ```bash
 # .env
 DISCORD_TOKEN={YOUR_TOKEN_HERE}
 ```
-You will also need to edit the configuration file (`settings.py`) and the whitelists file (`config/config.json`).
+You will also need to edit the configuration file (`settings.py`) and the whitelists file (`config/config.json.default` which you will need to move to `config.json`).
 ```bash
 vim settings.py
 vim config/config.json
