@@ -1,6 +1,10 @@
-import discord, os, time, asyncio, json, emoji
-from discord.ext import commands
-from dotenv import load_dotenv
+try:
+    import discord, os, time, asyncio, json, emoji, git
+    from discord.ext import commands
+    from dotenv import load_dotenv
+except Exception:
+    print("Could not load modules. Make sure you run:")
+    print("python3 -m pip install -r requirements.txt")
 
 import modules.variables.custom_emotes as custom_emotes
 from settings import *
@@ -18,8 +22,8 @@ from modules.cogs.ping import *
 # ---------------------------------------------------------------
 # Get token and start bot
 
-load_dotenv()
-TOKEN = os.getenv('DISCORD_TOKEN')
+check_defaults()
+TOKEN = get_env_token()
 
 intents = discord.Intents().all()
 client = botclass.MyBot(command_prefix='n!', intents=intents)
@@ -62,8 +66,6 @@ client.add_cog(PingCog(client))
 # Help command
 
 # Can't get this (remove_command) to work in a cog, feel free to improve it
-# Also, when you ctrl+c out of the bot it throws an exception because of this help
-@client.remove_command("help")
 @client.command()
 async def help(ctx):
 
@@ -78,9 +80,9 @@ async def help(ctx):
             value=help_text1, 
             inline=False)
 
-    author_is_owner = await client.is_owner(ctx.author)
+    isowner = await client.is_owner(ctx.author)     # Needs a variable so we can await
 
-    if (author_is_owner == True) or ( (int(ctx.guild.id) in client.whitelist) and (int(ctx.author.id) in client.whitelist[int(ctx.guild.id)]) ):
+    if (isowner) or ( (int(ctx.guild.id) in client.whitelist) and (int(ctx.author.id) in client.whitelist[int(ctx.guild.id)]) ):
         embed.add_field(name="Administration",
                 value=help_text2,
                 inline=False)

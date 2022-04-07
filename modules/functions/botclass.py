@@ -8,7 +8,7 @@ import settings
 
 class MyBot(commands.Bot):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs, help_command=None)
 
     # ---------------------------------------------------------------
     # Functions and initial settings
