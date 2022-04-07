@@ -3,3 +3,4 @@ python-dotenv
 youtube-dl
 PyNaCl
 emoji
+GitPython
