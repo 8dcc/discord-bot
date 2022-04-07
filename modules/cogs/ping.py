@@ -31,7 +31,7 @@ class PingCog(commands.Cog):
     # ---------------------------------------------------------------
     # Version command
 
-    @commands.command()
+    @commands.command(aliases=["ver"])
     async def version(self, ctx):
         repo = git.Repo(search_parent_directories=True)
         head_hash = repo.head.object.hexsha
