@@ -129,12 +129,12 @@ Thanks to the [discord.py](https://discord.com/invite/r3sSKJJ) community for bei
 - [X] Move whitelists to json file and read it from there instead of the code (so users can edit it easily).
 - [X] Separate code into multiple files.
 - [X] Add tags to `debug_print()`
+- [X] Add `n!version` for checking the commit hash with [git](https://stackoverflow.com/a/41210204/).
 - [ ] Wanna play blackjack with the bot  **:^)**
 - [ ] Add queue system.
 - [ ] Change messages (joined, playing...) to embeds.
 - [ ] Add `n!stats` command.
     - [ ] Show uptime?
-- [ ] Add `n!version` for checking the commit hash with [git](https://stackoverflow.com/a/41210204/).
 
 ## Related gists
 * [discord_purge.py](https://gist.github.com/r4v10l1/a21360c3f92266c0b03db7cc9b73e7ff) - Discord bot purge 1.
