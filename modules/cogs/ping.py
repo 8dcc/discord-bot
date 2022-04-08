@@ -46,10 +46,10 @@ class PingCog(commands.Cog):
             origin_emote = ":x:"
 
         head_description = f":whale: [`{head_hash}`](https://github.com/r4v10l1/discord-bot/commit/{head_hash})\n"
-        origin_description = f"{origin_emote} [`{origin_hash}`](https://github.com/r4v10l1/discord-bot/commit/{origin_hash})",
+        origin_description = f"{origin_emote} [`{origin_hash}`](https://github.com/r4v10l1/discord-bot/commit/{origin_hash})"
         embed = discord.Embed(title = "Version", 
                 url = "https://github.com/r4v10l1/discord-bot/commits/main",
-                description = head_description + origin_descriptiont, 
+                description = head_description + origin_description, 
                 color = custom_colors.DEFAULT_EMBED)
 
         await ctx.send(embed=embed)
