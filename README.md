@@ -13,6 +13,7 @@
 ## Table of contents
 * [Features](#features)
 	* [Music](#music)
+	* [Music](#messages)
 	* [Administration](#music)
 	* [Misc](#music)
 * [Running the bot yourself](#running-the-bot-yourself)
@@ -67,6 +68,7 @@ This commands will only work if you are the bot owner or you are in the am white
 	* `[E]` for errors (`discord_log_path`)
 	* `[ET]` for error timestamps (Wrote to `discord_log_path`, reference a date in `bot_error_path`)
 	* `[Module]` It also has a small tag about the module used (`Music`, `Administration`, ...)
+* Fetches the last remote repo information and compares the last origin/main commit with the head commit. See `n!version`
 
 ## Running the bot yourself
 First, you will need to edit the `.env_default` file (move it to `.env`), and replace there your bot token.
