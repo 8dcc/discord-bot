@@ -34,8 +34,11 @@ class PingCog(commands.Cog):
     @commands.command(aliases=["ver"])
     async def version(self, ctx):
         repo = git.Repo(search_parent_directories=True)
-        head_hash = repo.head.object.hexsha
-        origin_hash = repo.remotes.origin.refs.main.object.hexsha
+        repo.remotes.origin.fetch()     # Fetches the remote information instead of using the local info on origin
+
+        head_hash = repo.head.object.hexsha                         # Check the last head commit
+        origin_hash = repo.remotes.origin.refs.main.object.hexsha   # Check the last origin/main commit
+        # origin_hash = repo.remotes.origin.refs[0].object.hexsha   # Check the last origin/head commit
 
         if head_hash == origin_hash:
             origin_emote = ":white_check_mark:"
