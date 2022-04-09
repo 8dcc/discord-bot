@@ -83,7 +83,6 @@ vim config/config.json
 ```
 You can then run the bot with docker:
 ```bash
-# I am kinda new to docker so if you think it can be done better let me know
 docker build -t discord-bot .
 docker run --rm -d -it --name discord-bot discord-bot
 ```
