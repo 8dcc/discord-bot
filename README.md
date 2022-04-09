@@ -140,7 +140,8 @@ Thanks to the [discord.py](https://discord.com/invite/r3sSKJJ) community for bei
 - [ ] Add queue system.
 - [ ] Change messages (joined, playing...) to embeds.
 - [ ] Add `n!stats` command.
-    - [ ] Show uptime?
+    - [ ] Show uptime? -> From inside docker
+- [ ] Add `n!poll` and `n!roles` (that reads from `config.json`) command for starting polls or giving roles based on message reactions.
 
 ## Related gists
 * [discord_purge.py](https://gist.github.com/r4v10l1/a21360c3f92266c0b03db7cc9b73e7ff) - Discord bot purge 1.
