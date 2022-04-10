@@ -83,8 +83,12 @@ vim config/config.json
 ```
 You can then run the bot with docker:
 ```bash
-docker build -t discord-bot .
-docker run --rm -d -it --name discord-bot discord-bot
+# You may want to edit docker.sh if you use another root command like doas or if you want to change the docker flags
+
+sudo chmod +x docker.sh     # Give permission to execute the file
+./docker.sh build   # Will build the docker image (discord-bot:latest)
+./docker.sh run     # Will run the docker image (discord-bot:latest) 
+# By default it will run it in daemon mode with the container name discord-bot
 ```
 Or run it normally:
 ```bash
