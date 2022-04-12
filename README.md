@@ -13,7 +13,7 @@
 ## Table of contents
 * [Features](#features)
 	* [Music](#music)
-	* [Music](#messages)
+	* [Messages](#messages)
 	* [Administration](#music)
 	* [Misc](#music)
 * [Running the bot yourself](#running-the-bot-yourself)
