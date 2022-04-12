@@ -102,12 +102,19 @@ def get_env_token():
     elif token[1:-1] == "DOCKER_TOKEN":
         print("Docker token detected.")
         while True:
-            user_token = raw_input("Please input your token: ")
+            try:
+                user_token = input("Please input your token: ")
+            except KeyboardInterrupt:
+                os.system("clear")
+                print("Detected Ctrl+C. Exiting...")
+                exit(1)
+            os.system("clear")      # Imagine using windows lmao
             if len(user_token) != 59:
                 print("\rWrong token length. Please try again...")
                 continue
             else:
                 print("\rDone.")
+                return user_token
                 break
     else:
         return token

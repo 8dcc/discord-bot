@@ -150,6 +150,6 @@ async def on_message(message):
 # Starting the bot
 
 try:
-    client.run(TOKEN[1:-1])     # Start bot with the token from .env
+    client.run(TOKEN)     # Start bot with the token from .env
 except KeyboardInterrupt:
     exit("\nDetected Ctrl+C. Exiting...\n")
