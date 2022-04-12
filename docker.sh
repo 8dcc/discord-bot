@@ -1,12 +1,15 @@
 #!/bin/bash
 
-ADMIN_COMMAND="sudo"            # Use doas if you are a chad
-DOCKER_RUN_FLAGS="--rm -it -d --name discord-bot"  # Flags for ./docker.sh run
+ADMIN_COMMAND="sudo"                                # Use doas if you are a chad
+IMAGE_NAME="discord-bot"                            # Image and container name for docker
+DOCKER_RUN_FLAGS="--rm -it -d --name $IMAGE_NAME"   # Flags for ./docker.sh run
 
-if [[ $1 == "build" ]]; then
-    $ADMIN_COMMAND docker build -t discord-bot:latest .
+if [[ $1 == "clean" ]]; then
+    $ADMIN_COMMAND docker rmi $IMAGE_NAME:latest
+elif [[ $1 == "build" ]]; then
+    $ADMIN_COMMAND docker build -t $IMAGE_NAME:latest .
 elif [[ $1 == "run" ]]; then
-    $ADMIN_COMMAND docker run $DOCKER_RUN_FLAGS discord-bot
+    $ADMIN_COMMAND docker run $DOCKER_RUN_FLAGS $IMAGE_NAME
 elif [[ $1 == "help" || $1 == "--help" ]]; then
     echo "Showing help for docker.sh"
     echo "  ./docker.sh help    | Show this help"
