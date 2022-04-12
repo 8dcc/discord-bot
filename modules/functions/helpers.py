@@ -99,5 +99,15 @@ def get_env_token():
         print("Detected default token")
         print("You need to edit the TOKEN (in the .env file) before starting the bot!")
         exit(1)
+    elif token[1:-1] == "DOCKER_TOKEN":
+        print("Docker token detected.")
+        while True:
+            user_token = raw_input("Please input your token: ")
+            if len(user_token) != 59:
+                print("\rWrong token length. Please try again...")
+                continue
+            else:
+                print("\rDone.")
+                break
     else:
         return token
