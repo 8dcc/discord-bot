@@ -44,21 +44,21 @@ def bak_config_file(file_path):
 
 def check_defaults():
     # config/config.json
-    if not os.path.isfile("config/config.json"):                # The default config does not exist by default
-        print("I can't find config/config.json")
+    if not os.path.isfile(settings.config_path):                # The default config does not exist by default
+        print("I can't find %s" % settings.config_path)
         print("If this is your first time running the program, you can use the default one as a template.")
-        if os.path.isfile("config/config.json.default"):        # Only ask to clone if there is a file to clone
+        if os.path.isfile("%s.default" % settings.config_path):        # Only ask to clone if there is a file to clone
             try:
                 clone_input = input("Do you want me to copy the template to the config.json file? (Yes/No): ")
             except KeyboardInterrupt:
                 print("\nNot copying...")
                 exit(1)
             if "y" in clone_input.lower():
-                with open("config/config.json.default", "r") as default_file:
-                    with open("config/config.json", "w") as config_file:
+                with open("%s.default" % settings.config_path, "r") as default_file:
+                    with open(settings.config_path, "w") as config_file:
                         for line in default_file:
                             config_file.write(line)
-                print("Successfully copied config/config.json\n")
+                print("Successfully copied %s\n" % config/config.json)
             else:
                 print("Not copying...")
                 exit(1)
@@ -89,6 +89,14 @@ def check_defaults():
             print("Exiting...")
             exit(1)
 
+    if not os.path.isfile(settings.discord_log_path):
+        with open(settings.discord_log_path, "w"):
+            print("Log file not found. Creating at %s..." % settings.discord_log_path)
+    if not os.path.isfile(settings.bot_error_path):
+        with open(settings.bot_error_path, "w"):
+            print("Error log file not found. Creating at %s..." % settings.bot_error_path)
+
+
 # ---------------------------------------------------------------
 # Check default token from .env
 
@@ -117,4 +125,4 @@ def get_env_token():
                 return user_token
                 break
     else:
-        return token
+        return token[1:-1]
