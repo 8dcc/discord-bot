@@ -1,3 +1,14 @@
+# Discord bot made by r4v10l1
+# https://github.com/r4v10l1/discord-bot
+
+# First check if the python version is correct
+import sys
+if not sys.version_info >= (3, 7):
+    print("Your python version does not support fstrings, therefore the bot cannot run.")
+    print("Version required: Python 3.7")
+    exit(1)
+
+# Try to import everything external
 try:
     import discord, os, time, asyncio, json, emoji, git
     from discord.ext import commands
@@ -5,7 +16,9 @@ try:
 except Exception:
     print("Could not load modules. Make sure you run:")
     print("python3 -m pip install -r requirements.txt")
+    exit(1)
 
+# Import my own modules and cogs
 import modules.variables.custom_emotes as custom_emotes
 from settings import *
 
@@ -73,15 +86,15 @@ async def help(ctx):
     help_misc = "`n!version` - Shows a comparison between the local commit and the remote commit. \n`n!ping` - The bot reacts to your message to make sure it is working."
     help_admin = "*This commands will only work if you are the bot owner or if you are in the whitelist.*\n`n!kick @someone` to kick a user.\n`n!ban @someone` to ban a user.\n`n!mute @someone` to mute a user. Also `n!m`.\n`n!unmute @someone` to unmute a user. Also `n!um`.\n`n!deafen @someone` to deafen a user. Also `n!d`.\n`n!undeafen @someone` to undeafen a user. Also `n!ud`.\n`n!purge @someone <messages_to_check>` will check X messages, and will delete them if the author is the specified user. Also `n!clean`.\n`n!spam <amount> <message>` will spam the specified messae in the current channel the amount of times."
 
-    embed = discord.Embed(title="Help", 
-            url="https://github.com/r4v10l1/discord-bot/blob/main/README.md", 
+    embed = discord.Embed(title="Help",
+            url="https://github.com/r4v10l1/discord-bot/blob/main/README.md",
             color=0x1111ff)
     embed.set_thumbnail(url="https://u.teknik.io/m3lTR.png")
-    embed.add_field(name="Music", 
-            value=help_music, 
+    embed.add_field(name="Music",
+            value=help_music,
             inline=False)
-    embed.add_field(name="Misc", 
-            value=help_misc, 
+    embed.add_field(name="Misc",
+            value=help_misc,
             inline=False)
 
     isowner = await client.is_owner(ctx.author)     # Needs a variable so we can await
@@ -153,3 +166,6 @@ try:
     client.run(TOKEN)     # Start bot with the token from .env
 except KeyboardInterrupt:
     exit("\nDetected Ctrl+C. Exiting...\n")
+except Exception as e:
+    print("Exception detected when running bot...")
+    print(e)
