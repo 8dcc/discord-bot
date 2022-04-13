@@ -22,7 +22,11 @@ if [[ " $* " == *" help "* || " $* " == *" --help "* ]]; then
     exit 1;
 fi
 
-# Check arguments that can be convined
+# Check arguments that can be convined. They are in this order because you 
+# never want to stop the container on the same command you start it.
+if [[ " $* " == *" stop "* ]]; then
+    $ADMIN_COMMAND docker stop $IMAGE_NAME
+fi
 if [[ " $* " == *" clean "* || " $* " == *" clear "* ]]; then
     $ADMIN_COMMAND docker rmi $IMAGE_NAME:latest
 fi
@@ -32,6 +36,4 @@ fi
 if [[ " $* " == *" run "* ]]; then
     $ADMIN_COMMAND docker run $DOCKER_RUN_FLAGS $IMAGE_NAME
 fi
-if [[ " $* " == *" stop "* ]]; then
-    $ADMIN_COMMAND docker stop $IMAGE_NAME
-fi
+
