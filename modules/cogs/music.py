@@ -88,7 +88,7 @@ class MusicCog(commands.Cog):
 
                 embed = discord.Embed(
                         title="Playing...",
-                        description="**Playing `%s`**\n[[Link](%s)]" % (info_dict['title'].replace("`", ""), info_dict['webpage_url']),
+                        description="`%s`\n[[Link](%s)]" % (info_dict['title'].replace("`", ""), info_dict['webpage_url']),
                         color=0x11ff11)
                 await ctx.send(embed=embed)
                 debug_print("[Bot] [Music] %s requested play for \'%s\' (%s)." % (str(ctx.author), url, info_dict['title']))
@@ -103,7 +103,7 @@ class MusicCog(commands.Cog):
 
                 embed = discord.Embed(
                         title="Playing...",
-                        description="**Playing `%s`**\n[[Link](%s)]" % (info_dict['title'].replace("`", ""), info_dict['webpage_url']),
+                        description="`%s`\n[[Link](%s)]" % (info_dict['title'].replace("`", ""), info_dict['webpage_url']),
                         color=0x11ff11)
                 await ctx.send(embed=embed)
                 # Keep in mind that url is the function parameter
