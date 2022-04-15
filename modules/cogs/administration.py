@@ -41,7 +41,7 @@ class AdministrationCog(commands.Cog):
         elif isinstance(error, commands.CheckFailure):
             embed = discord.Embed(
                     title="Missing permissions", 
-                    description="**You don\'t have the permissions to do that", 
+                    description="**You don\'t have the permissions to do that**", 
                     color=0xff1111)
             await ctx.send(embed=embed)
             debug_print('[Bot] [E] [Admin] Could not parse kick arguments for user: %s' % ctx.author)
@@ -85,7 +85,7 @@ class AdministrationCog(commands.Cog):
         elif isinstance(error, commands.CheckFailure):
             embed = discord.Embed(
                     title="Missing permissions", 
-                    description="**You don\'t have the permissions to do that",  
+                    description="**You don\'t have the permissions to do that**",  
                     color=0xff1111)
             await ctx.send(embed=embed)
             debug_print('[Bot] [E] [Admin] Could not parse ban arguments for user: %s' % ctx.author)
