@@ -4,7 +4,7 @@ ADMIN_COMMAND="sudo"                                # Use doas if you are a chad
 IMAGE_NAME="discord-bot"                            # Image and container name for docker
 MOUNT_FLAGS="-v $(pwd):/discord-bot"                # Flag for specifying the folder mount point (so logs and configs persist)
 ENVIROMENT_FLAGS="-e PYTHONDONTWRITEBYTECODE=1"     # Flag for enviroment variables
-DOCKER_RUN_FLAGS="--rm -it -d --name $IMAGE_NAME"      # Flags for ./docker.sh run
+DOCKER_RUN_FLAGS="--rm -it -d --name $IMAGE_NAME"   # Flags for ./docker.sh run
 
 # First check if there are no arguments
 if [[ $# == 0 ]]; then
