@@ -1,5 +1,5 @@
 FROM python:3
-#COPY . /discord-bot
+COPY . /discord-bot
 WORKDIR /discord-bot
 
 RUN apt-get update
