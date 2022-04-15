@@ -17,10 +17,10 @@ fi
 if [[ " $* " == *" help "* || " $* " == *" --help "* ]]; then
     echo "Showing help for docker.sh"
     echo "  ./docker.sh help    | Show this help"
+    echo "  ./docker.sh stop    | Stop the docker container ($IMAGE_NAME)"
     echo "  ./docker.sh clean   | Remove the docker image (The container is auto-removed by default)"
     echo "  ./docker.sh build   | Build the docker container ($IMAGE_NAME:latest)"
     echo "  ./docker.sh run     | Run the docker container ($IMAGE_NAME:latest)"
-    echo "  ./docker.sh stop    | Stop the docker container ($IMAGE_NAME)"
     exit 1;
 fi
 
