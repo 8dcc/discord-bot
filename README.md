@@ -144,9 +144,10 @@ Thanks to the [discord.py](https://discord.com/invite/r3sSKJJ) community for bei
 - [X] Separate code into multiple files.
 - [X] Add tags to `debug_print()`
 - [X] Add `n!version` for checking the commit hash with [git](https://stackoverflow.com/a/41210204/).
+- [X] Change messages (joined, playing...) to embeds.
+- [ ] Move `n!help` and message events to cogs.
 - [ ] Wanna play blackjack with the bot  **:^)**
 - [ ] Add queue system.
-- [ ] Change messages (joined, playing...) to embeds.
 - [ ] Add `n!stats` command.
     - [ ] Show uptime? -> From inside docker
 - [ ] Add `n!poll` and `n!roles` (that reads from `config.json`) command for starting polls or giving roles based on message reactions.
