@@ -19,6 +19,7 @@
 * [Running the bot yourself](#running-the-bot-yourself)
 * [Structure of the bot](#structure-of-the-bot)
 * [Possible errors](#possible-errors)
+* [Contributing](#contributing)
 * [Todo](#todo)
 * [Related gists](#related-gists)
 
@@ -133,6 +134,9 @@ Thanks to the [discord.py](https://discord.com/invite/r3sSKJJ) community for bei
 * The bot can't download age-restricted content.
 * The bot might fail depending on the youtube servers.
 * The bot can't play playlists right now.
+
+## Contributing
+Check [CONTRIBUTE.md](https://github.com/r4v10l1/discord-bot/blob/main/CONTRIBUTE.md).
 
 ## Todo
 - [X] Bot needs to be on a channel to play music, if you use `n!play <song>` the bot will join, but you will need to type the command again for it to work. You can use `n!join` to make the bot join the channel before using `n!play`.
