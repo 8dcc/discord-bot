@@ -58,7 +58,7 @@ def check_defaults():
                     with open(settings.config_path, "w") as config_file:
                         for line in default_file:
                             config_file.write(line)
-                print("Successfully copied %s\n" % config/config.json)
+                print("Successfully copied %s\n" % settings.config_path)
             else:
                 print("Not copying...")
                 exit(1)
