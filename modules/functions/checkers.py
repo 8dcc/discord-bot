@@ -20,6 +20,11 @@ def check_whitelist():
             return False
     return commands.check(predicate)
 
+def check_server_admin():
+    def predicate(ctx):
+        return ctx.author.guild_permissions.administrator
+    return commands.check(predicate)
+
 def check_am_whitelist():
     def predicate(ctx):
         if str(ctx.guild.id) in ctx.bot.am_whitelist:
@@ -36,3 +41,4 @@ def check_message_blacklist(bot, user_id, guild_id):
 
 def check_autoreactions(bot, guild_id, author_id):
     return str(guild_id) in bot.autoreact_list and str(author_id) in bot.autoreact_list[str(guild_id)]
+

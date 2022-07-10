@@ -115,7 +115,7 @@ async def help(ctx):
 
     isowner = await client.is_owner(ctx.author)     # Needs a variable so we can await
 
-    if (isowner) or ( (int(ctx.guild.id) in client.whitelist) and (int(ctx.author.id) in client.whitelist[int(ctx.guild.id)]) ):
+    if (isowner) or (check_server_admin()) or ((int(ctx.guild.id) in client.whitelist) and (int(ctx.author.id) in client.whitelist[int(ctx.guild.id)])):
         embed.add_field(name="Administration",
                 value=help_admin,
                 inline=False)

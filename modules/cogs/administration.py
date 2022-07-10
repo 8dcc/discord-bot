@@ -13,7 +13,7 @@ class AdministrationCog(commands.Cog):
     # Kick command
 
     @commands.command()
-    @commands.check_any(commands.is_owner(), check_whitelist())
+    @commands.check_any(commands.is_owner(), check_server_admin(), check_whitelist())
     async def kick(self, ctx, member : discord.Member, *, reason=None):
         await member.kick(reason=reason)
         embed = discord.Embed(
@@ -57,7 +57,7 @@ class AdministrationCog(commands.Cog):
     # Ban command
 
     @commands.command()
-    @commands.check_any(commands.is_owner(), check_whitelist())
+    @commands.check_any(commands.is_owner(), check_server_admin(), check_whitelist())
     async def ban(self, ctx, member : discord.Member, *, reason=None):
         await member.kick(reason=reason)
         embed = discord.Embed(
@@ -101,7 +101,7 @@ class AdministrationCog(commands.Cog):
     # Mute command
 
     @commands.command(aliases=["m"])
-    @commands.check_any(commands.is_owner(), check_whitelist())
+    @commands.check_any(commands.is_owner(), check_server_admin(), check_whitelist())
     async def mute(self, ctx, member : discord.Member, *, reason : str = "Unknown."):
         await member.edit(mute=True)
         embed = discord.Embed(
@@ -145,7 +145,7 @@ class AdministrationCog(commands.Cog):
     # Unmute command
 
     @commands.command(aliases=["um"])
-    @commands.check_any(commands.is_owner(), check_whitelist())
+    @commands.check_any(commands.is_owner(), check_server_admin(), check_whitelist())
     async def unmute(self, ctx, *, member : discord.Member):
         await member.edit(mute=False)
         embed = discord.Embed(
@@ -189,7 +189,7 @@ class AdministrationCog(commands.Cog):
     # Deafen command
 
     @commands.command(aliases=["d", "deaf"])
-    @commands.check_any(commands.is_owner(), check_whitelist())
+    @commands.check_any(commands.is_owner(), check_server_admin(), check_whitelist())
     async def deafen(self, ctx, member : discord.Member, *, reason : str = "Unknown."):
         await member.edit(deafen=True)
         embed = discord.Embed(
@@ -234,7 +234,7 @@ class AdministrationCog(commands.Cog):
     # Undeafen command
 
     @commands.command(aliases=["ud", "undeaf"])
-    @commands.check_any(commands.is_owner(), check_whitelist())
+    @commands.check_any(commands.is_owner(), check_server_admin(), check_whitelist())
     async def undeafen(self, ctx, *, member : discord.Member):
         await member.edit(deafen=False)
         embed = discord.Embed(
@@ -279,7 +279,7 @@ class AdministrationCog(commands.Cog):
     # Move command
 
     @commands.command(aliases=["mo"])
-    @commands.check_any(commands.is_owner(), check_whitelist())
+    @commands.check_any(commands.is_owner(), check_server_admin(), check_whitelist())
     async def move(self, ctx, member : discord.Member, *, channel : discord.VoiceChannel):
         await member.move_to(channel)
         embed = discord.Embed(

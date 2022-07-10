@@ -13,7 +13,7 @@ class MessagesCog(commands.Cog):
     # Purge commands
 
     @commands.command(aliases=["clean"])
-    @commands.check_any(commands.is_owner(), check_whitelist())
+    @commands.check_any(commands.is_owner(), check_server_admin(), check_whitelist())
     async def purge(self, ctx, member : discord.Member, amount : int):
 
         def check_purge(check_me):
@@ -67,7 +67,7 @@ class MessagesCog(commands.Cog):
     # Spam command
 
     @commands.command()
-    @commands.check_any(commands.is_owner(), check_whitelist())
+    @commands.check_any(commands.is_owner(), check_server_admin(), check_whitelist())
     async def spam(self, ctx, amount : int, *, message2send : str):
         if amount < 1:
             embed = discord.Embed(
