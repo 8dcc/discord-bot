@@ -60,6 +60,9 @@ async def on_ready():
     else:
         exit("activityType error. Exiting...")
 
+    with open(settings.discord_log_path, "a") as discord_log:
+        discord_log.write(f"\n=======================================[ {time.strftime('%d %b %Y - %H:%M:%S')} - Bot connected to discord ]=======================================\n\n")
+
 # ---------------------------------------------------------------
 # Add cogs
 
@@ -101,7 +104,7 @@ async def help(ctx):
     `n!undeafen @someone` to undeafen a user. Also `n!ud`.
     `n!purge @someone <messages_to_check>` will check X messages, and will delete them if the author is the specified user. Also `n!clean`.
     `n!spam <amount> <message>` will spam the specified messae in the current channel the amount of times."""
-
+    
     embed = discord.Embed(title="Help",
             url="https://github.com/r4v10l1/discord-bot/blob/main/README.md",
             color=custom_colors.DEFAULT_EMBED)
