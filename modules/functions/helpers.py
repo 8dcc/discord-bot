@@ -43,6 +43,14 @@ def bak_config_file(file_path):
 # Check default files
 
 def check_defaults():
+    # log folder
+    if not os.path.isdir(settings.discord_log_folder):
+        os.mkdir(settings.discord_log_path)
+    
+    # config folder
+    if not os.path.isdir(settings.config_folder):
+        os.mkdir(settings.config_path)
+
     # config/config.json
     if not os.path.isfile(settings.config_path):                # The default config does not exist by default
         print("I can't find %s" % settings.config_path)
@@ -66,7 +74,7 @@ def check_defaults():
             print("Exiting...")
             exit(1)
 
-    #.env
+    # .env
     if not os.path.isfile(".env"):
         print("I can't find .env")
         print("If this is your first time running the program, you can use the default one as a template.")
