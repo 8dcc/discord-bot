@@ -149,13 +149,16 @@ async def on_message(message):
         reaction_array = client.autoreact_list[str(message.author.guild.id)][str(message.author.id)]
 
         for reaction_name in reaction_array:
+            if ":" not in reaction_name:
+                reaction_name = ":" + reaction_name + ":"
+
             if ":regional_indicator_" in reaction_name:
                 emote = custom_emotes.get_regional_emoji(reaction_name)
             elif ":" in reaction_name.strip():
                 emote = emoji.emojize(str(reaction_name), language='alias')
                 if emote == reaction_name.strip():
                     emote = emoji.emojize(str(reaction_name), language='en')
-            else:
+            else:       # Should not happen...
                 emote = reaction_name
 
             try:
