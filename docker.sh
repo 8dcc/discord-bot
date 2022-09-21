@@ -27,15 +27,19 @@ fi
 # Check arguments that can be convined. They are in this order because you 
 # never want to stop the container on the same command you start it.
 if [[ " $* " == *" stop "* ]]; then
+    echo "$ADMIN_COMMAND docker stop $IMAGE_NAME"
     $ADMIN_COMMAND docker stop $IMAGE_NAME
 fi
 if [[ " $* " == *" clean "* || " $* " == *" clear "* ]]; then
+    echo "$ADMIN_COMMAND docker rmi $IMAGE_NAME:latest"
     $ADMIN_COMMAND docker rmi $IMAGE_NAME:latest
 fi
 if [[ " $* " == *" build "* ]]; then
+    echo "$ADMIN_COMMAND docker build -t $IMAGE_NAME:latest ."
     $ADMIN_COMMAND docker build -t $IMAGE_NAME:latest .
 fi
 if [[ " $* " == *" run "* ]]; then
+    echo "$ADMIN_COMMAND docker run $DOCKER_RUN_FLAGS $ENVIROMENT_FLAGS $MOUNT_FLAGS $IMAGE_NAME"
     $ADMIN_COMMAND docker run $DOCKER_RUN_FLAGS $ENVIROMENT_FLAGS $MOUNT_FLAGS $IMAGE_NAME
 fi
 
